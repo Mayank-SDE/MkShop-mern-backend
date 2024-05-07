@@ -1,0 +1,22 @@
+{
+  "name": "mkshop-backend",
+  "version": "1.0.0",
+  "description": "This is the backend part of my ecommerce web application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mayank-SDE/MkShop-mern-backend.git"
+  },
+  "author": "mayank Choudhary",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mayank-SDE/MkShop-mern-backend/issues"
+  },
+  "homepage": "https://github.com/Mayank-SDE/MkShop-mern-backend#readme",
+  "dependencies": {
+    "typescript": "^5.4.5"
+  }
+}
