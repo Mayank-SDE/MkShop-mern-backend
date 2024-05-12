@@ -1,27 +1,32 @@
 import express from 'express';
+import dotenv from 'dotenv';
+
+// importing Routes
+import userRoute from './routes/userRoute.js';
+import mongoDBConnect from './utils/database.js';
+import { errorMiddleware } from './middlewares/error.js';
 
 const app = express();
 
-app.post('/register', (req, res) => {
-  try {
-    //get all the data from the body
-    const { name, email, password, gender, image, dob } = req.body;
-    //all the data should exists
-    if (!(name && email && password && gender && image && dob)) {
-      res.status(400).send('All the fields are compulsory.');
-    }
+dotenv.config();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-    //check for the user exists in the database
-
-    //encrypt the password
-
-    //save the user in the db
-
-    //generate the token for the user and send it
-  } catch (error) {}
+app.get('/', (request, response) => {
+  return response.status(200).json({
+    success: true,
+    message: 'API is working with /api/v1',
+  });
 });
 
-const PORT = 3000;
+// using Routes
+app.use('/api/v1/user', userRoute);
+
+app.use(errorMiddleware);
+
+mongoDBConnect;
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Express is running on PORT http://localhost:${PORT}`);
 });
