@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import ErrorHandler from '../utils/utilityClass.js';
-import { ControllerType } from '../types/controllerType.js';
 
 export const errorMiddleware = (
   error: ErrorHandler,
@@ -17,7 +16,7 @@ export const errorMiddleware = (
     message: error.message,
   });
 };
-
+/*
 export const TryCatch = (controllerFunction: ControllerType) => {
   return (request: Request, response: Response, next: NextFunction) => {
     return Promise.resolve(controllerFunction(request, response, next)).catch(
@@ -27,3 +26,4 @@ export const TryCatch = (controllerFunction: ControllerType) => {
     );
   };
 };
+*/

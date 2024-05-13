@@ -6,10 +6,14 @@ export const errorMiddleware = (error, request, response, next) => {
         message: error.message,
     });
 };
-export const TryCatch = (controllerFunction) => {
-    return (request, response, next) => {
-        return Promise.resolve(controllerFunction(request, response, next)).catch((error) => {
-            next(error);
-        });
-    };
+/*
+export const TryCatch = (controllerFunction: ControllerType) => {
+  return (request: Request, response: Response, next: NextFunction) => {
+    return Promise.resolve(controllerFunction(request, response, next)).catch(
+      (error) => {
+        next(error);
+      }
+    );
+  };
 };
+*/

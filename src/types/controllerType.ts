@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
-import { NewUserRequestBody } from './userType.js';
+/*import { NextFunction, Request, Response } from 'express';
+
 
 export type ControllerType = (
-  request: Request<{}, {}, NewUserRequestBody>,
+  request: Request,
   response: Response,
   next: NextFunction
-) => Promise<Response<any, Record<string, any>> | void>;
+) => Promise<void | Response<any, Record<string, any>>>;
+*/
