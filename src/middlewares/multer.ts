@@ -1,22 +1,12 @@
 import fs from 'fs';
 import multer from 'multer';
 import { v4 as uuid } from 'uuid';
+import { Product } from '../models/product.js';
+import { User } from '../models/user.js';
 const storage = multer.diskStorage({
   destination(request, file, callback) {
     // Generate the destination directory path
     let destinationDirectory = 'assets';
-    if (request.body.category) {
-      destinationDirectory += `/${request.body.category
-        .trim()
-        .replace(/\s+/g, '-')
-        .toUpperCase()}`;
-    }
-    if (request.body.name) {
-      destinationDirectory += `/${request.body.name
-        .trim()
-        .replace(/\s+/g, '-')
-        .toUpperCase()}`;
-    }
 
     if (!fs.existsSync(destinationDirectory)) {
       fs.mkdirSync(destinationDirectory, { recursive: true });

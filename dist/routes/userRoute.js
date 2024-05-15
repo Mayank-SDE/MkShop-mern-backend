@@ -9,7 +9,11 @@ router.post('/register', singleUpload, registerUser);
 router.post('/login', loginUser);
 //route - /api/v1/user/all
 router.get('/all', adminOnly, getAllUsers);
-router.route('/:userId').get(getSingleUser).delete(deleteUser).put(updateUser);
+router
+    .route('/:userId')
+    .get(getSingleUser)
+    .delete(deleteUser)
+    .put(singleUpload, updateUser);
 /*
 //route - /api/v1/user/:userId
 router.get('/:userId', getSingleUser);

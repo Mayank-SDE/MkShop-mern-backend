@@ -2,6 +2,7 @@ import ErrorHandler from '../utils/utilityClass.js';
 import { Product } from '../models/product.js';
 import { rm } from 'fs';
 import { nodeCache } from '../app.js';
+import { invalidateCache } from '../utils/invalidateCache.js';
 export const newProduct = async (request, response, next) => {
     try {
         const { title, description, price, rating, discountPercentage, stock, brand, category, } = request.body;
@@ -37,6 +38,7 @@ export const newProduct = async (request, response, next) => {
             thumbnail: imagesPath[0],
             images: imagesPath,
         });
+        await invalidateCache({ product: true });
         return response.status(201).json({
             success: true,
             message: 'Products created successfully.',
@@ -163,6 +165,7 @@ export const deleteSingleProduct = async (request, response, next) => {
             });
         });
         await product.deleteOne();
+        await invalidateCache({ product: true, productId: String(product._id) });
         return response.status(200).json({
             success: true,
             message: 'Product deleted successfully',
@@ -179,30 +182,32 @@ export const updateSingleProduct = async (request, response, next) => {
         if (!product) {
             return next(new ErrorHandler('Invalid product id', 404));
         }
-        if (category) {
-            product.category = category;
-        }
-        request.body.category = product.category;
         const files = request.files;
-        if (Array.isArray(files) && files.length === 4) {
-            {
-                const imagesPath = files?.map((file) => file.path);
-                if (imagesPath && imagesPath.length !== 4) {
-                    return next(new ErrorHandler('Please enter 4 images of the product captured from different angles', 400));
-                }
-                if (imagesPath) {
-                    product.images.map((path) => {
-                        rm(path, () => {
-                            console.log('Old images deleted from database.');
-                        });
+        if (Array.isArray(files)) {
+            const imagesPath = files?.map((file) => file.path);
+            if (imagesPath && imagesPath.length !== 4) {
+                imagesPath.map((path) => {
+                    rm(path, () => {
+                        console.log('Deleting unneccassary images from database.');
                     });
-                    product.images = imagesPath;
-                    product.thumbnail = imagesPath[0];
-                }
+                });
+                return next(new ErrorHandler('Please enter 4 images of the product captured from different angles', 400));
+            }
+            if (imagesPath) {
+                product.images.map((path) => {
+                    rm(path, () => {
+                        console.log('Old images deleted from database.');
+                    });
+                });
+                product.images = imagesPath;
+                product.thumbnail = imagesPath[0];
             }
         }
         if (title) {
             product.title = title;
+        }
+        if (category) {
+            product.category = category;
         }
         if (description) {
             product.description = description;
@@ -223,6 +228,7 @@ export const updateSingleProduct = async (request, response, next) => {
             product.brand = brand;
         }
         await product.save();
+        await invalidateCache({ product: true, productId: String(product._id) });
         return response.status(201).json({
             success: true,
             message: 'Products updated successfully.',

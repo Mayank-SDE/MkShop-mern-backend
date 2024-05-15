@@ -98,6 +98,7 @@ export const updateUser = async (
     if (!user) {
       return next(new ErrorHandler('User not found', 404));
     }
+
     const image = request.file;
 
     if (image) {

@@ -44,8 +44,11 @@ export type BaseQueryType = {
   brand?: string;
 };
 
-export type InvalidateCache{
-  products?: boolean;
+export type InvalidateCache = {
+  product?: boolean;
   order?: boolean;
   admin?: boolean;
-}
+  userId?: string;
+  orderId?: string;
+  productId?: string | string[];
+};
