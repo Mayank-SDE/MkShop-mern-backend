@@ -8,6 +8,10 @@ import {
   UpdateUserParams,
   UpdateUserRequestBody,
 } from '../types/userType.js';
+import jwt from 'jsonwebtoken';
+
+import { config } from 'dotenv';
+config();
 
 import bcrypt from 'bcrypt';
 import ErrorHandler from '../utils/utilityClass.js';
@@ -75,10 +79,19 @@ export const loginUser = async (
       return next(new ErrorHandler('Invalid password', 401));
     }
 
-    return response.status(200).json({
+    const payload = {
+      username: user.email,
+      id: user.age,
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
+      expiresIn: '1d',
+    });
+
+    return response.status(200).send({
       success: true,
-      message: `Welcome back ${user.name.toUpperCase()}`,
-      user,
+      message: 'Logged in successfully!',
+      token: 'Bearer ' + token,
     });
   } catch (error) {
     return next(error);
@@ -199,5 +212,20 @@ export const getSingleUser = async (
     });
   } catch (error) {
     return next(error);
+  }
+};
+
+export const getLoginFailed = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    response.status(401).json({
+      success: false,
+      message: 'failure',
+    });
+  } catch (error) {
+    return next;
   }
 };

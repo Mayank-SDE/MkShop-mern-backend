@@ -6,6 +6,7 @@ import { nodeCache } from '../app.js';
 export const newOrder = async (request, response, next) => {
     try {
         const { shippingInfo, user, status, tax, shippingCharges, subTotal, total, discount, orderItems, } = request.body;
+        console.log(orderItems);
         if (!shippingInfo ||
             !user ||
             !status ||
@@ -27,7 +28,7 @@ export const newOrder = async (request, response, next) => {
             orderItems,
         });
         await reduceStock(orderItems);
-        await invalidateCache({
+        invalidateCache({
             product: true,
             order: true,
             admin: true,
@@ -130,7 +131,7 @@ export const processOrder = async (request, response, next) => {
                 break;
         }
         await order.save();
-        await invalidateCache({
+        invalidateCache({
             product: false,
             order: true,
             admin: true,
@@ -153,7 +154,7 @@ export const deleteOrder = async (request, response, next) => {
             return next(new ErrorHandler('Order not found', 404));
         }
         await order.deleteOne();
-        await invalidateCache({
+        invalidateCache({
             product: false,
             order: true,
             admin: true,

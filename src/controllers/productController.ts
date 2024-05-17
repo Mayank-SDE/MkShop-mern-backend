@@ -76,7 +76,7 @@ export const newProduct = async (
       thumbnail: imagesPath[0],
       images: imagesPath,
     });
-    await invalidateCache({ product: true });
+    invalidateCache({ product: true, admin: true });
 
     return response.status(201).json({
       success: true,
@@ -234,7 +234,11 @@ export const deleteSingleProduct = async (
 
     await product.deleteOne();
 
-    await invalidateCache({ product: true, productId: String(product._id) });
+    invalidateCache({
+      product: true,
+      admin: true,
+      productId: String(product._id),
+    });
     return response.status(200).json({
       success: true,
       message: 'Product deleted successfully',
@@ -323,7 +327,11 @@ export const updateSingleProduct = async (
     }
 
     await product.save();
-    await invalidateCache({ product: true, productId: String(product._id) });
+    invalidateCache({
+      product: true,
+      admin: true,
+      productId: String(product._id),
+    });
     return response.status(201).json({
       success: true,
       message: 'Products updated successfully.',

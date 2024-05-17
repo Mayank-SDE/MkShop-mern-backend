@@ -1,4 +1,7 @@
 import { User } from '../models/user.js';
+import jwt from 'jsonwebtoken';
+import { config } from 'dotenv';
+config();
 import bcrypt from 'bcrypt';
 import ErrorHandler from '../utils/utilityClass.js';
 import { rm } from 'fs';
@@ -49,10 +52,17 @@ export const loginUser = async (request, response, next) => {
         if (!passwordMatching) {
             return next(new ErrorHandler('Invalid password', 401));
         }
-        return response.status(200).json({
+        const payload = {
+            username: user.email,
+            id: user.age,
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+            expiresIn: '1d',
+        });
+        return response.status(200).send({
             success: true,
-            message: `Welcome back ${user.name.toUpperCase()}`,
-            user,
+            message: 'Logged in successfully!',
+            token: 'Bearer ' + token,
         });
     }
     catch (error) {
@@ -146,5 +156,16 @@ export const getSingleUser = async (request, response, next) => {
     }
     catch (error) {
         return next(error);
+    }
+};
+export const getLoginFailed = (request, response, next) => {
+    try {
+        response.status(401).json({
+            success: false,
+            message: 'failure',
+        });
+    }
+    catch (error) {
+        return next;
     }
 };

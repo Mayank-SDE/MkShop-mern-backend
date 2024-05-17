@@ -23,6 +23,7 @@ export const newOrder = async (
       discount,
       orderItems,
     } = request.body;
+    console.log(orderItems);
 
     if (
       !shippingInfo ||
@@ -49,7 +50,7 @@ export const newOrder = async (
     });
 
     await reduceStock(orderItems);
-    await invalidateCache({
+    invalidateCache({
       product: true,
       order: true,
       admin: true,
@@ -168,7 +169,7 @@ export const processOrder = async (
     }
 
     await order.save();
-    await invalidateCache({
+    invalidateCache({
       product: false,
       order: true,
       admin: true,
@@ -196,7 +197,7 @@ export const deleteOrder = async (
     }
 
     await order.deleteOne();
-    await invalidateCache({
+    invalidateCache({
       product: false,
       order: true,
       admin: true,

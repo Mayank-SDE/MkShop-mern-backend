@@ -4,7 +4,7 @@ import { Product } from '../models/product.js';
 import { User } from '../models/user.js';
 import { InvalidateCache } from '../types/productType.js';
 
-export const invalidateCache = async ({
+export const invalidateCache = ({
   product,
   order,
   admin,
@@ -40,5 +40,13 @@ export const invalidateCache = async ({
     nodeCache.del(orderKeys);
   }
   if (admin) {
+    const adminKeys = [
+      'admin-stats',
+      'admin-pie-chart',
+      'admin-bar-chart',
+      'admin-line-chart',
+    ];
+
+    nodeCache.del(adminKeys);
   }
 };

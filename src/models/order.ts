@@ -74,7 +74,10 @@ const orderSchema = new mongoose.Schema(
       {
         title: String,
         price: Number,
-        qunatity: Number,
+        quantity: {
+          type: Number,
+          required: [true, 'Please enter the quantity'],
+        },
         productId: {
           type: mongoose.Types.ObjectId,
           ref: 'Product',
