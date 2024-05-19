@@ -1,17 +1,28 @@
 import ErrorHandler from '../utils/utilityClass.js';
-import { User } from '../models/user.js';
 //Middleware to make sure only admin is allowed
 export const adminOnly = async (request, response, next) => {
-    const { id } = request.query;
-    if (!id) {
-        return next(new ErrorHandler('You are not logged in.', 401));
+    try {
+        const user = request.user;
+        if (user.role !== 'admin') {
+            return next(new ErrorHandler('You are not admin.', 401));
+        }
+        return next();
     }
-    const user = await User.findById(id);
-    if (!user) {
-        return next(new ErrorHandler('User not found', 404));
+    catch (error) {
+        return next(error);
     }
-    if (user.role !== 'admin') {
-        return next(new ErrorHandler('You are not Authorized.', 401));
+};
+export const loggedInOnly = (request, response, next) => {
+    try {
+        if (!request.isAuthenticated()) {
+            return response.status(401).json({
+                success: false,
+                message: 'You are not logged in',
+            });
+        }
+        return next();
     }
-    next();
+    catch (error) {
+        return next(error);
+    }
 };

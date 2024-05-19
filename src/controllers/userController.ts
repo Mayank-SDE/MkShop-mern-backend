@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { User, UserInterface } from '../models/user.js';
+
 import {
   DeleteUserParams,
   GetUserParams,
@@ -8,10 +9,6 @@ import {
   UpdateUserParams,
   UpdateUserRequestBody,
 } from '../types/userType.js';
-import jwt from 'jsonwebtoken';
-
-import { config } from 'dotenv';
-config();
 
 import bcrypt from 'bcrypt';
 import ErrorHandler from '../utils/utilityClass.js';
@@ -23,10 +20,10 @@ export const registerUser = async (
   next: NextFunction
 ) => {
   try {
-    const { name, email, gender, password, dob, role } = request.body;
+    const { username, email, gender, password, dob, role } = request.body;
     const image = request.file;
 
-    if (!name || !email || !gender || !password || !dob) {
+    if (!username || !email || !gender || !password || !dob) {
       rm(image?.path as string, () => {
         console.log('File deleted');
       });
@@ -42,10 +39,10 @@ export const registerUser = async (
     }
 
     user = await User.create({
-      name,
+      username,
       email,
       gender,
-      image: image?.path,
+      image: image?.path || 'assets/MK.png',
       password: bcrypt.hashSync(password, 10),
       dob: new Date(dob),
       role,
@@ -53,45 +50,8 @@ export const registerUser = async (
 
     return response.status(201).json({
       success: true,
-      message: `Welcome to the MKShop ${user.name.toUpperCase()}`,
+      message: `Welcome to the MKShop ${user.username.toUpperCase()}`,
       user,
-    });
-  } catch (error) {
-    return next(error);
-  }
-};
-
-export const loginUser = async (
-  request: Request<{}, {}, LoginUserRequestBody>,
-  response: Response,
-  next: NextFunction
-) => {
-  try {
-    const { email, password } = request.body;
-
-    const user: UserInterface | null = await User.findOne({ email });
-    if (!user) {
-      return next(new ErrorHandler('Email is not registered', 404));
-    }
-    const passwordMatching = bcrypt.compareSync(password, user.password);
-
-    if (!passwordMatching) {
-      return next(new ErrorHandler('Invalid password', 401));
-    }
-
-    const payload = {
-      username: user.email,
-      id: user.age,
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {
-      expiresIn: '1d',
-    });
-
-    return response.status(200).send({
-      success: true,
-      message: 'Logged in successfully!',
-      token: 'Bearer ' + token,
     });
   } catch (error) {
     return next(error);
@@ -104,7 +64,7 @@ export const updateUser = async (
   next: NextFunction
 ) => {
   try {
-    const { name, email, password, dob, gender } = request.body;
+    const { username, email, password, dob, gender } = request.body;
     const _id = request.params.userId;
     let user = await User.findById(_id);
 
@@ -116,12 +76,12 @@ export const updateUser = async (
 
     if (image) {
       rm(user.image, () => {
-        console.log(`${user?.name}'s old image deleted successfully`);
+        console.log(`${user?.username}'s old image deleted successfully`);
       });
     }
 
-    if (name) {
-      user.name = name;
+    if (username) {
+      user.username = username;
     }
     if (email) {
       user.email = email;
@@ -139,7 +99,7 @@ export const updateUser = async (
     await user.save();
     return response.status(201).json({
       success: true,
-      message: `${user.name.toUpperCase()}'s profile data updated successfully.`,
+      message: `${user.username.toUpperCase()}'s profile data updated successfully.`,
     });
   } catch (error) {
     next(error);
@@ -178,7 +138,7 @@ export const deleteUser = async (
       return next(new ErrorHandler('Invalid id, user not found.', 404));
     }
     rm(user.image, () => {
-      console.log(` ${user.name}'s image deleted successfully.`);
+      console.log(` ${user.username}'s image deleted successfully.`);
     });
     await user.deleteOne();
 
@@ -221,11 +181,54 @@ export const getLoginFailed = (
   next: NextFunction
 ) => {
   try {
-    response.status(401).json({
+    return response.status(400).json({
       success: false,
-      message: 'failure',
+      message: 'Not able to log in. Try again later.',
     });
   } catch (error) {
     return next;
+  }
+};
+
+export const getLoginSuccess = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log('Hie mayank');
+    console.log('body', request.body);
+    console.log('user', request.user!);
+    if (!request.user) {
+      return next(new ErrorHandler('User not logged in.', 400));
+    }
+    return response.status(202).json({
+      success: true,
+      user: request.user,
+      message: 'Logged in successfully.',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getLogout = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    request.logout((logoutError) => {
+      if (logoutError) {
+        return next(logoutError);
+      }
+
+      response.status(202).json({
+        success: true,
+        message: 'Logged out successfully.',
+      });
+    });
+  } catch (error) {
+    return next(error);
   }
 };

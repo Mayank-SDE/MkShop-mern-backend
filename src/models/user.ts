@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+
 export interface UserInterface extends Document {
-  name: string;
+  _id: string;
+  username: string;
   email: string;
   password: string;
   image: string;
@@ -10,19 +12,20 @@ export interface UserInterface extends Document {
   role: 'admin' | 'user';
   createdAt: Date;
   updatedAt: Date;
+  googleId?: string;
+  githubId?: string;
   // Virtual attribute
   age: number;
 }
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
       required: [true, 'Please enter your name'],
     },
     email: {
       type: String,
       required: [true, 'Please enter your email.'],
-      unique: [true, 'Email already exists'],
       validate: validator.default.isEmail,
     },
     password: {
@@ -34,12 +37,14 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ['male', 'female', 'other'],
+      enum: ['male', 'female', 'other', 'NA'],
       required: [true, 'Please enter your gender.'],
+      default: 'NA',
     },
     dob: {
       type: Date,
       required: [true, 'Please enter your date of birth'],
+      default: new Date('01/01/2000'),
     },
     role: {
       type: String,

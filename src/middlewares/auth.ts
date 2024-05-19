@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import ErrorHandler from '../utils/utilityClass.js';
-import { User } from '../models/user.js';
+import { User, UserInterface } from '../models/user.js';
 
 //Middleware to make sure only admin is allowed
 export const adminOnly = async (
@@ -8,21 +8,32 @@ export const adminOnly = async (
   response: Response,
   next: NextFunction
 ) => {
-  const { id } = request.query;
+  try {
+    const user = request.user as UserInterface;
 
-  if (!id) {
-    return next(new ErrorHandler('You are not logged in.', 401));
+    if (user.role !== 'admin') {
+      return next(new ErrorHandler('You are not admin.', 401));
+    }
+    return next();
+  } catch (error) {
+    return next(error);
   }
+};
 
-  const user = await User.findById(id);
-
-  if (!user) {
-    return next(new ErrorHandler('User not found', 404));
+export const loggedInOnly = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!request.isAuthenticated()) {
+      return response.status(401).json({
+        success: false,
+        message: 'You are not logged in',
+      });
+    }
+    return next();
+  } catch (error) {
+    return next(error);
   }
-
-  if (user.role !== 'admin') {
-    return next(new ErrorHandler('You are not Authorized.', 401));
-  }
-
-  next();
 };

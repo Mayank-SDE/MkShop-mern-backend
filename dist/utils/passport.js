@@ -1,33 +1,58 @@
 import passport from 'passport';
-import { Strategy as JwtStrategy } from 'passport-jwt';
-import { ExtractJwt } from 'passport-jwt';
 import { Strategy as GoogleStrategy, } from 'passport-google-oauth20';
-import { Strategy as FacebookStrategy, } from 'passport-facebook';
 import { Strategy as GitHubStrategy, } from 'passport-github2';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { config } from 'dotenv';
 import { User } from '../models/user.js';
-const GOOGLE_CLIENT_ID = '';
-const GOOGLE_CLIENT_SECRET = '';
-const GITHUB_CLIENT_ID = '';
-const GITHUB_CLIENT_SECRET = '';
-const FACEBOOK_CLIENT_ID = '';
-const FACEBOOK_CLIENT_SECRET = '';
-const opts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET_KEY,
-};
-passport.use(new JwtStrategy(opts, async function (jwt_payload, done) {
+import { compareSync } from 'bcrypt';
+config();
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+passport.use(new LocalStrategy(async function (username, password, done) {
     try {
-        const user = await User.findOne({ _id: jwt_payload.id }).exec();
-        if (user) {
-            return done(null, user);
+        const user = await User.findOne({
+            username: username,
+        });
+        console.log(user);
+        if (!user) {
+            return done(null, false, { message: 'Incorrect username.' });
         }
-        else {
-            return done(null, false);
-            // or you could create a new account
+        if (!compareSync(password, user.password)) {
+            return done(null, false, { message: 'Incorrect password.' });
         }
+        done(null, user);
     }
     catch (err) {
-        return done(err, false);
+        done(err, false);
+    }
+}));
+passport.use(new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: '/auth/google/callback',
+}, async function (accessToken, refreshToken, profile, done) {
+    try {
+        const user = await User.findOne({
+            googleId: profile.id,
+        });
+        if (!user) {
+            let newUser = new User({
+                googleId: profile.id,
+                username: profile.displayName,
+                email: profile.emails ? profile.emails[0].value : '',
+                image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
+                password: profile.id,
+                role: 'user',
+            });
+            newUser.save();
+            return done(null, newUser);
+        }
+        done(null, user);
+    }
+    catch (error) {
+        done(error, false);
     }
 }));
 passport.use(new GitHubStrategy({
@@ -35,55 +60,24 @@ passport.use(new GitHubStrategy({
     clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: '/auth/github/callback',
 }, function (accessToken, refreshToken, profile, done) {
+    console.log(profile);
     done(null, profile);
-    console.log(accessToken);
-    console.log(refreshToken);
 }));
-passport.use(new FacebookStrategy({
-    clientID: FACEBOOK_CLIENT_ID,
-    clientSecret: FACEBOOK_CLIENT_SECRET,
-    callbackURL: '/auth/facebook/callback',
-}, function (accessToken, refreshToken, profile, done) {
-    done(null, profile);
-    console.log(accessToken);
-    console.log(refreshToken);
-}));
-passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback',
-}, function (accessToken, refreshToken, profile, done) {
-    done(null, profile);
-    console.log(accessToken);
-    console.log(refreshToken);
-}
-/*  //It is going to give us accessToke , refreshToken , profile and an callback function.
-function (accessToken, refreshToken, profile, done) {
-  // console.log(profile);
-
-  //    Database configuration
-  // User.findOrCreate({ googleId: profile.id }, function (err, user) {
-  //     return cb(err, user);
-  // });
-
-  /*
-    if you are using the mongodb
-
-    cons user={
-    username:profile.displayName,
-    avatar:profile.photos[0]
-    }
-
-    user.save();
-    */
-/*
-  done(null, profile);
-}*/
-));
-/*serializeUser() is setting id as cookie in user's browser and passport. deserializeUser() is getting id from the cookie, which is then used in callback to get user info or something else, based on that id or some other piece of information from the cookie */
+//This will persist the user data inside the session.
+//This serializeUser method will persist the session object user data. When we are login in using the username and password.
 passport.serializeUser((user, done) => {
-    done(null, user);
+    console.log('serializeUser', user);
+    done(null, user._id);
 });
-passport.deserializeUser((user, done) => {
-    done(null, user);
+//This deserializeUser will fetch the session object based on the session id that is stores inside the session object.
+passport.deserializeUser(async (_id, done) => {
+    try {
+        console.log('deserializw');
+        const user = await User.findById(_id);
+        console.log('Deserialize user', user);
+        done(null, user);
+    }
+    catch (err) {
+        done(err, null);
+    }
 });
