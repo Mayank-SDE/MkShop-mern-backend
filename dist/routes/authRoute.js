@@ -9,29 +9,11 @@ const router = express.Router();
 // const CLIENT_URL = process.env.CLIENT_URL as string;
 // route  -  /auth/register
 router.post('/register', singleUpload, registerUser);
-/*
 // route  -  /auth/login
-router.post(
-  '/login',
-  passport.authenticate('local', {
+router.post('/login', passport.authenticate('local', {
     successRedirect: '/auth/login/success',
     failureRedirect: '/auth/login/failed',
-  })
-);
-*/
-router.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err)
-            return next(err);
-        if (!user)
-            return res.redirect('/auth/login/failed');
-        req.logIn(user, (err) => {
-            if (err)
-                return next(err);
-            return res.redirect('/auth/login/success');
-        });
-    })(req, res, next);
-});
+}));
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback', passport.authenticate('google', {
     successRedirect: '/auth/login/success',

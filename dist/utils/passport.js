@@ -34,9 +34,14 @@ passport.use(new GoogleStrategy({
     callbackURL: '/auth/google/callback',
 }, async function (accessToken, refreshToken, profile, done) {
     try {
-        const user = await User.findOne({
+        let user = await User.findOne({
             googleId: profile.id,
         });
+        if (!user) {
+            if (profile.emails) {
+                user = await User.findOne({ email: profile.emails[0].value });
+            }
+        }
         if (!user) {
             let newUser = new User({
                 googleId: profile.id,
@@ -59,9 +64,31 @@ passport.use(new GitHubStrategy({
     clientID: GITHUB_CLIENT_ID,
     clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: '/auth/github/callback',
-}, function (accessToken, refreshToken, profile, done) {
-    console.log(profile);
-    done(null, profile);
+}, async function (accessToken, refreshToken, profile, done) {
+    try {
+        let user = await User.findOne({
+            githubId: profile.id,
+        });
+        if (!user) {
+            user = await User.findOne({ githubProfileURL: profile.profileUrl });
+        }
+        if (!user) {
+            let newUser = new User({
+                githubId: profile.id,
+                username: profile.username,
+                githubProfileURL: profile.profileUrl,
+                image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
+                password: profile.id,
+                role: 'user',
+            });
+            newUser.save();
+            return done(null, newUser);
+        }
+        done(null, user);
+    }
+    catch (error) {
+        done(error, false);
+    }
 }));
 //This will persist the user data inside the session.
 //This serializeUser method will persist the session object user data. When we are login in using the username and password.

@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, 'Please enter your email.'],
+        unique: true,
         validate: validator.default.isEmail,
     },
     password: {
@@ -16,17 +16,14 @@ const userSchema = new mongoose.Schema({
     },
     image: {
         type: String,
+        default: 'assets/MK.png',
     },
     gender: {
         type: String,
-        enum: ['male', 'female', 'other', 'NA'],
-        required: [true, 'Please enter your gender.'],
-        default: 'NA',
+        enum: ['male', 'female', 'other'],
     },
     dob: {
         type: Date,
-        required: [true, 'Please enter your date of birth'],
-        default: new Date('01/01/2000'),
     },
     role: {
         type: String,

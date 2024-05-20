@@ -162,9 +162,15 @@ export const getLogout = (request, response, next) => {
             if (logoutError) {
                 return next(logoutError);
             }
-            response.status(202).json({
-                success: true,
-                message: 'Logged out successfully.',
+            request.session.destroy((err) => {
+                if (err) {
+                    return next(err);
+                }
+                response.clearCookie('connect.sid'); // Ensure this matches your session cookie name
+                return response.status(202).json({
+                    success: true,
+                    message: 'Logged out successfully.',
+                });
             });
         });
     }

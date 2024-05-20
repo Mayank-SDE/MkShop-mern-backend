@@ -45,7 +45,7 @@ app.use(session({
         dbName: MONGO_DB_NAME,
         collectionName: 'sessions',
         autoRemove: 'interval',
-        autoRemoveInterval: 1,
+        autoRemoveInterval: 10,
     }),
 }));
 app.use(passport.initialize());
@@ -56,8 +56,8 @@ app.use(cors({
     methods: 'GET,POST,PUT,PATCH,DELETE',
     credentials: true,
 }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use('/assets', express.static('assets'));
 app.use(morgan('dev'));
 // Health check route

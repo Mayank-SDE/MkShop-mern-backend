@@ -60,10 +60,14 @@ passport.use(
       done: (error: any, user?: UserInterface | boolean) => void
     ) {
       try {
-        const user: UserInterface | null = await User.findOne({
+        let user: UserInterface | null = await User.findOne({
           googleId: profile.id,
         });
-
+        if (!user) {
+          if (profile.emails) {
+            user = await User.findOne({ email: profile.emails[0].value });
+          }
+        }
         if (!user) {
           let newUser = new User({
             googleId: profile.id,
@@ -91,14 +95,35 @@ passport.use(
       clientSecret: GITHUB_CLIENT_SECRET,
       callbackURL: '/auth/github/callback',
     },
-    function (
+    async function (
       accessToken: string,
       refreshToken: string,
       profile: GitHubProfile,
       done: (error: any, user?: any) => void
     ) {
-      console.log(profile);
-      done(null, profile);
+      try {
+        let user: UserInterface | null = await User.findOne({
+          githubId: profile.id,
+        });
+        if (!user) {
+          user = await User.findOne({ githubProfileURL: profile.profileUrl });
+        }
+        if (!user) {
+          let newUser = new User({
+            githubId: profile.id,
+            username: profile.username,
+            githubProfileURL: profile.profileUrl,
+            image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
+            password: profile.id,
+            role: 'user',
+          });
+          newUser.save();
+          return done(null, newUser);
+        }
+        done(null, user);
+      } catch (error) {
+        done(error, false);
+      }
     }
   )
 );

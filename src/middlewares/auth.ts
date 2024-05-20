@@ -26,6 +26,8 @@ export const loggedInOnly = (
   next: NextFunction
 ) => {
   try {
+    console.log(request.isAuthenticated());
+    console.log(request.user);
     if (!request.isAuthenticated()) {
       return response.status(401).json({
         success: false,
