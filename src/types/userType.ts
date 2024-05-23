@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongoose';
 
-export type NewUserRequestBody = {
+export interface NewUserRequestBody {
   username: string;
   email: string;
   image: string;
@@ -8,14 +8,16 @@ export type NewUserRequestBody = {
   gender: string;
   dob: Date;
   password: string;
-};
+}
 
 export interface LoginUserRequestBody {
   username: string;
   password: string;
 }
 
-export type UpdateUserRequestBody = NewUserRequestBody;
+export interface UpdateUserRequestBody extends NewUserRequestBody {
+  _id: string;
+}
 export type UpdateUserParams = {
   userId: string;
 };

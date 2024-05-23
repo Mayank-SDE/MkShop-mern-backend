@@ -14,8 +14,6 @@ export const adminOnly = async (request, response, next) => {
 };
 export const loggedInOnly = (request, response, next) => {
     try {
-        console.log(request.isAuthenticated());
-        console.log(request.user);
         if (!request.isAuthenticated()) {
             return response.status(401).json({
                 success: false,

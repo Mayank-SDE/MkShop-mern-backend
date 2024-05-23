@@ -2,6 +2,7 @@ import { User } from '../models/user.js';
 import bcrypt from 'bcrypt';
 import ErrorHandler from '../utils/utilityClass.js';
 import { rm } from 'fs';
+import mongoose from 'mongoose';
 export const registerUser = async (request, response, next) => {
     try {
         const { username, email, gender, password, dob, role } = request.body;
@@ -31,7 +32,6 @@ export const registerUser = async (request, response, next) => {
         return response.status(201).json({
             success: true,
             message: `Welcome to the MKShop ${user.username.toUpperCase()}`,
-            user,
         });
     }
     catch (error) {
@@ -40,8 +40,7 @@ export const registerUser = async (request, response, next) => {
 };
 export const updateUser = async (request, response, next) => {
     try {
-        const { username, email, password, dob, gender } = request.body;
-        const _id = request.params.userId;
+        const { _id, username, email, password, dob, gender } = request.body;
         let user = await User.findById(_id);
         if (!user) {
             return next(new ErrorHandler('User not found', 404));
@@ -51,6 +50,7 @@ export const updateUser = async (request, response, next) => {
             rm(user.image, () => {
                 console.log(`${user?.username}'s old image deleted successfully`);
             });
+            user.image = image.path;
         }
         if (username) {
             user.username = username;
@@ -59,7 +59,7 @@ export const updateUser = async (request, response, next) => {
             user.email = email;
         }
         if (password) {
-            user.password = bcrypt.hashSync(password, 10);
+            user.password = bcrypt.hashSync(password, 12);
         }
         if (dob) {
             user.dob = dob;
@@ -70,6 +70,7 @@ export const updateUser = async (request, response, next) => {
         await user.save();
         return response.status(201).json({
             success: true,
+            user,
             message: `${user.username.toUpperCase()}'s profile data updated successfully.`,
         });
     }
@@ -93,7 +94,7 @@ export const getAllUsers = async (request, response, next) => {
 export const deleteUser = async (request, response, next) => {
     try {
         const _id = request.params.userId;
-        const user = await User.findById(_id);
+        const user = await User.findById(new mongoose.Types.ObjectId(_id));
         if (!user) {
             return next(new ErrorHandler('Invalid id, user not found.', 404));
         }
@@ -140,15 +141,27 @@ export const getLoginFailed = (request, response, next) => {
 };
 export const getLoginSuccess = (request, response, next) => {
     try {
-        console.log('Hie mayank');
-        console.log('body', request.body);
-        console.log('user', request.user);
         if (!request.user) {
+            console.log('user not found');
             return next(new ErrorHandler('User not logged in.', 400));
         }
+        console.log(request.user);
+        const { _id, username, image, role, email, password, gender, age, dob, createdAt, updatedAt, } = request.user;
         return response.status(202).json({
             success: true,
-            user: request.user,
+            user: {
+                _id,
+                username,
+                image,
+                role,
+                email,
+                password,
+                gender,
+                age,
+                dob,
+                createdAt,
+                updatedAt,
+            },
             message: 'Logged in successfully.',
         });
     }

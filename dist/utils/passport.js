@@ -4,7 +4,7 @@ import { Strategy as GitHubStrategy, } from 'passport-github2';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { config } from 'dotenv';
 import { User } from '../models/user.js';
-import { compareSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 config();
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
@@ -15,7 +15,6 @@ passport.use(new LocalStrategy(async function (username, password, done) {
         const user = await User.findOne({
             username: username,
         });
-        console.log(user);
         if (!user) {
             return done(null, false, { message: 'Incorrect username.' });
         }
@@ -48,8 +47,10 @@ passport.use(new GoogleStrategy({
                 username: profile.displayName,
                 email: profile.emails ? profile.emails[0].value : '',
                 image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
-                password: profile.id,
+                password: hashSync(profile.id, 12),
+                dob: new Date('01/01/2000'),
                 role: 'user',
+                gender: 'male',
             });
             newUser.save();
             return done(null, newUser);
@@ -73,13 +74,19 @@ passport.use(new GitHubStrategy({
             user = await User.findOne({ githubProfileURL: profile.profileUrl });
         }
         if (!user) {
+            user = await User.findOne({ email: `${profile.username}@gmail.com` });
+        }
+        if (!user) {
             let newUser = new User({
                 githubId: profile.id,
                 username: profile.username,
                 githubProfileURL: profile.profileUrl,
                 image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
-                password: profile.id,
+                password: hashSync(profile.id, 12),
+                dob: new Date('01/01/2000'),
                 role: 'user',
+                gender: 'male',
+                email: `${profile.username}@gmail.com`,
             });
             newUser.save();
             return done(null, newUser);
@@ -93,15 +100,12 @@ passport.use(new GitHubStrategy({
 //This will persist the user data inside the session.
 //This serializeUser method will persist the session object user data. When we are login in using the username and password.
 passport.serializeUser((user, done) => {
-    console.log('serializeUser', user);
     done(null, user._id);
 });
 //This deserializeUser will fetch the session object based on the session id that is stores inside the session object.
 passport.deserializeUser(async (_id, done) => {
     try {
-        console.log('deserializw');
         const user = await User.findById(_id);
-        console.log('Deserialize user', user);
         done(null, user);
     }
     catch (err) {

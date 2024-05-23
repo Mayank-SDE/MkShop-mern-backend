@@ -20,6 +20,9 @@ export interface UserInterface extends Document {
 }
 const userSchema = new mongoose.Schema(
   {
+    googleId: String,
+    githubId: String,
+    githubProfileURL: String,
     username: {
       type: String,
       required: [true, 'Please enter your name'],
@@ -27,6 +30,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
+      required: [true, 'Pleease specify your email address'],
       validate: validator.default.isEmail,
     },
     password: {
@@ -40,9 +44,12 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ['male', 'female', 'other'],
+      required: [true, 'Please specify your gender'],
+      default: 'other',
     },
     dob: {
       type: Date,
+      required: [true, 'Please enter the data of birth.'],
     },
     role: {
       type: String,

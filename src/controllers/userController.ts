@@ -13,6 +13,7 @@ import {
 import bcrypt from 'bcrypt';
 import ErrorHandler from '../utils/utilityClass.js';
 import { rm } from 'fs';
+import mongoose from 'mongoose';
 
 export const registerUser = async (
   request: Request<{}, {}, NewUserRequestBody>,
@@ -51,7 +52,6 @@ export const registerUser = async (
     return response.status(201).json({
       success: true,
       message: `Welcome to the MKShop ${user.username.toUpperCase()}`,
-      user,
     });
   } catch (error) {
     return next(error);
@@ -59,13 +59,13 @@ export const registerUser = async (
 };
 
 export const updateUser = async (
-  request: Request<UpdateUserParams, {}, UpdateUserRequestBody>,
+  request: Request<{}, {}, UpdateUserRequestBody>,
   response: Response,
   next: NextFunction
 ) => {
   try {
-    const { username, email, password, dob, gender } = request.body;
-    const _id = request.params.userId;
+    const { _id, username, email, password, dob, gender } = request.body;
+
     let user = await User.findById(_id);
 
     if (!user) {
@@ -78,6 +78,7 @@ export const updateUser = async (
       rm(user.image, () => {
         console.log(`${user?.username}'s old image deleted successfully`);
       });
+      user.image = image.path;
     }
 
     if (username) {
@@ -87,7 +88,7 @@ export const updateUser = async (
       user.email = email;
     }
     if (password) {
-      user.password = bcrypt.hashSync(password, 10);
+      user.password = bcrypt.hashSync(password, 12);
     }
     if (dob) {
       user.dob = dob;
@@ -99,6 +100,7 @@ export const updateUser = async (
     await user.save();
     return response.status(201).json({
       success: true,
+      user,
       message: `${user.username.toUpperCase()}'s profile data updated successfully.`,
     });
   } catch (error) {
@@ -132,7 +134,7 @@ export const deleteUser = async (
   try {
     const _id = request.params.userId;
 
-    const user = await User.findById(_id);
+    const user = await User.findById(new mongoose.Types.ObjectId(_id));
 
     if (!user) {
       return next(new ErrorHandler('Invalid id, user not found.', 404));
@@ -196,15 +198,39 @@ export const getLoginSuccess = (
   next: NextFunction
 ) => {
   try {
-    console.log('Hie mayank');
-    console.log('body', request.body);
-    console.log('user', request.user!);
     if (!request.user) {
+      console.log('user not found');
       return next(new ErrorHandler('User not logged in.', 400));
     }
+    console.log(request.user);
+    const {
+      _id,
+      username,
+      image,
+      role,
+      email,
+      password,
+      gender,
+      age,
+      dob,
+      createdAt,
+      updatedAt,
+    } = request.user as UserInterface;
     return response.status(202).json({
       success: true,
-      user: request.user,
+      user: {
+        _id,
+        username,
+        image,
+        role,
+        email,
+        password,
+        gender,
+        age,
+        dob,
+        createdAt,
+        updatedAt,
+      },
       message: 'Logged in successfully.',
     });
   } catch (error) {

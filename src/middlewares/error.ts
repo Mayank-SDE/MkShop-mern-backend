@@ -19,14 +19,3 @@ export const errorMiddleware = (
     message: error.message,
   });
 };
-/*
-export const TryCatch = (controllerFunction: ControllerType) => {
-  return (request: Request, response: Response, next: NextFunction) => {
-    return Promise.resolve(controllerFunction(request, response, next)).catch(
-      (error) => {
-        next(error);
-      }
-    );
-  };
-};
-*/

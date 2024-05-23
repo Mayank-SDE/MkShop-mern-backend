@@ -5,16 +5,20 @@ import passport from 'passport';
 import { config } from 'dotenv';
 import { singleUpload } from '../middlewares/multer.js';
 import {
+  deleteUser,
+  getAllUsers,
   getLoginFailed,
   getLoginSuccess,
   getLogout,
+  getSingleUser,
   registerUser,
+  updateUser,
 } from '../controllers/userController.js';
-import { loggedInOnly } from '../middlewares/auth.js';
+import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
 
-// const CLIENT_URL = process.env.CLIENT_URL as string;
+const CLIENT_URL = process.env.CLIENT_URL as string;
 
 // route  -  /auth/register
 router.post('/register', singleUpload, registerUser);
@@ -27,19 +31,23 @@ router.post(
     failureRedirect: '/auth/login/failed',
   })
 );
+
+// route  -  /auth/google
 router.get(
   '/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
+// route  -  /auth/google/callback
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    successRedirect: '/auth/login/success',
+    successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
   })
 );
 
+// route  -  /auth/github
 router.get(
   '/github',
   passport.authenticate('github', {
@@ -47,18 +55,38 @@ router.get(
   })
 );
 
+// route  -  /auth/github/callback
 router.get(
   '/github/callback',
   passport.authenticate('github', {
-    successRedirect: '/auth/login/success',
+    successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
   })
 );
 
+// route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
 
+// route  -  /auth/login/failed
 router.get('/login/failed', getLoginFailed);
 
+// route - /auth/logout
 router.get('/logout', loggedInOnly, getLogout);
 
+//route - /auth/all
+router.get('/all', loggedInOnly, adminOnly, getAllUsers);
+
+//route - /auth/profile/update
+router.put('/profile/update', loggedInOnly, singleUpload, updateUser);
+
+//route - /auth/profile/delete/:userId
+router.delete('/profile/delete/:userId', loggedInOnly, deleteUser);
+
+/*
+router
+  .route('/:userId')
+  .get(loggedInOnly, getSingleUser)
+  .delete(loggedInOnly, deleteUser)
+  .put(loggedInOnly, singleUpload, updateUser);
+*/
 export default router;
