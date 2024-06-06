@@ -1,8 +1,14 @@
 import express from 'express';
 import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 import { multipleUpload } from '../middlewares/multer.js';
-import { deleteSingleProduct, getAllBrands, getAllCategories, getAllProducts, getLatestProducts, getSearchedProducts, getSingleProduct, newProduct, updateSingleProduct, } from '../controllers/productController.js';
+import { deleteSingleProduct, getAllBrands, getAllCategories, getAllProducts, getLatestProducts, getSearchedProducts, getSingleProduct, newProduct, 
+// postAllProducts,
+updateSingleProduct, } from '../controllers/productController.js';
 const router = express.Router();
+/*
+//route - /api/v1/product/all
+router.post('/all', postAllProducts);
+*/
 //route - /api/v1/product/new
 router.post('/new', loggedInOnly, adminOnly, multipleUpload, newProduct);
 //route - /api/v1/product/latest

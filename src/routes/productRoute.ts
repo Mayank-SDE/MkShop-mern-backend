@@ -11,11 +11,16 @@ import {
   getSearchedProducts,
   getSingleProduct,
   newProduct,
+  // postAllProducts,
   updateSingleProduct,
 } from '../controllers/productController.js';
 
 const router = express.Router();
 
+/*
+//route - /api/v1/product/all
+router.post('/all', postAllProducts);
+*/
 //route - /api/v1/product/new
 router.post('/new', loggedInOnly, adminOnly, multipleUpload, newProduct);
 

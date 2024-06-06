@@ -56,7 +56,7 @@ export const getLatestProducts = async (request, response, next) => {
             products = JSON.parse(nodeCache.get('latest-products'));
         }
         else {
-            products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+            products = await Product.find().sort({ createdAt: -1 }).limit(5);
             nodeCache.set('latest-products', JSON.stringify(products));
         }
         return response.status(200).json({
@@ -288,3 +288,50 @@ export const getSearchedProducts = async (request, response, next) => {
         return next(error);
     }
 };
+/*
+export const postAllProducts = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    const { products } = request.body;
+
+    products.forEach(
+      async (product: {
+        category: string;
+        brand: string;
+        title: string;
+        description: string;
+        price: number;
+        discountPercentage: number;
+        rating: number;
+        stock: number;
+        thumbnail: string;
+        images: string[];
+      }) => {
+        const databaseProduct = await Product.create({
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          discountPercentage: product.discountPercentage,
+          rating: product.rating,
+          stock: product.stock,
+          brand: product.brand,
+          category: product.category,
+          thumbnail: product.thumbnail,
+          images: product.images,
+        });
+        databaseProduct.save();
+      }
+    );
+
+    return response.status(201).json({
+      success: true,
+      message: 'Products created successfully.',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+*/
