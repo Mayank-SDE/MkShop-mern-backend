@@ -67,11 +67,11 @@ export const newProduct = async (
     await Product.create({
       title,
       description,
-      price,
-      rating,
-      discountPercentage,
-      stock,
-      brand,
+      price: Number(price),
+      rating: Number(rating),
+      discountPercentage: Number(discountPercentage),
+      stock: Number(stock),
+      brand: category.trim().replace(/\s+/g, '-').toUpperCase(),
       category: category.trim().replace(/\s+/g, '-').toUpperCase(),
       thumbnail: imagesPath[0],
       images: imagesPath,
@@ -111,49 +111,47 @@ export const getLatestProducts = async (
     return next(error);
   }
 };
-
-//Revalidate on new,update or delete products and on New order
-export const getAllCategories = async (
+export const getBrandsByCategory = async (
   request: Request,
   response: Response,
   next: NextFunction
 ) => {
   try {
-    let categories;
-    if (nodeCache.has('categories')) {
-      categories = JSON.parse(nodeCache.get('categories') as string);
-    } else {
-      categories = await Product.distinct('category');
-      nodeCache.set('categories', JSON.stringify(categories));
-    }
-
-    return response.status(200).json({
-      success: true,
-      categories,
-    });
-  } catch (error) {
-    return next(error);
-  }
-};
-
-//Revalidate on new,update or delete products and on New order
-export const getAllBrands = async (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  try {
+    const { category } = request.query;
     let brands;
-    if (nodeCache.has('brands')) {
-      brands = JSON.parse(nodeCache.get('brand') as string);
+
+    if (category && category !== '') {
+      brands = await Product.distinct('brand', { category });
     } else {
       brands = await Product.distinct('brand');
-      nodeCache.set('brands', JSON.stringify(brands));
     }
 
     return response.status(200).json({
       success: true,
       brands,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+export const getCategoriesByBrand = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    const { brand } = request.query;
+    let categories;
+
+    if (brand && brand !== '') {
+      categories = await Product.distinct('category', { brand });
+    } else {
+      categories = await Product.distinct('category');
+    }
+
+    return response.status(200).json({
+      success: true,
+      categories,
     });
   } catch (error) {
     return next(error);
@@ -347,13 +345,18 @@ export const getSearchedProducts = async (
   next: NextFunction
 ) => {
   try {
-    const { search, sort, category, price, brand } = request.query;
+    const {
+      search,
+      sort,
+      category,
+      price,
+      brand,
+      page: queryPage,
+    } = request.query;
 
-    const page = Number(request.query.page) || 1;
-
+    const page = Number(queryPage) || 1;
     const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
-
-    const skip = Number(limit * (page - 1));
+    const skip = limit * (page - 1);
 
     const baseQuery: BaseQueryType = {};
 
@@ -363,27 +366,31 @@ export const getSearchedProducts = async (
         $options: 'i',
       };
     }
+
     if (price) {
       baseQuery.price = {
         $lte: Number(price),
       };
     }
+
     if (category) {
       baseQuery.category = category;
     }
+
     if (brand) {
       baseQuery.brand = brand;
     }
 
-    const [products, filteredOnlyProducts] = await Promise.all([
+    const [products, totalProducts] = await Promise.all([
       Product.find(baseQuery)
         .sort(sort && { price: sort === 'asc' ? 1 : -1 })
         .limit(limit)
         .skip(skip),
-      Product.find(baseQuery),
+      Product.countDocuments(baseQuery),
     ]);
 
-    const totalPage = Math.ceil(filteredOnlyProducts.length / limit);
+    const totalPage = Math.ceil(totalProducts / limit);
+
     return response.status(200).json({
       success: true,
       products,

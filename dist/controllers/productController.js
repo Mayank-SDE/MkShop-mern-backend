@@ -29,11 +29,11 @@ export const newProduct = async (request, response, next) => {
         await Product.create({
             title,
             description,
-            price,
-            rating,
-            discountPercentage,
-            stock,
-            brand,
+            price: Number(price),
+            rating: Number(rating),
+            discountPercentage: Number(discountPercentage),
+            stock: Number(stock),
+            brand: category.trim().replace(/\s+/g, '-').toUpperCase(),
             category: category.trim().replace(/\s+/g, '-').toUpperCase(),
             thumbnail: imagesPath[0],
             images: imagesPath,
@@ -68,40 +68,38 @@ export const getLatestProducts = async (request, response, next) => {
         return next(error);
     }
 };
-//Revalidate on new,update or delete products and on New order
-export const getAllCategories = async (request, response, next) => {
+export const getBrandsByCategory = async (request, response, next) => {
     try {
-        let categories;
-        if (nodeCache.has('categories')) {
-            categories = JSON.parse(nodeCache.get('categories'));
+        const { category } = request.query;
+        let brands;
+        if (category && category !== '') {
+            brands = await Product.distinct('brand', { category });
         }
         else {
-            categories = await Product.distinct('category');
-            nodeCache.set('categories', JSON.stringify(categories));
+            brands = await Product.distinct('brand');
         }
         return response.status(200).json({
             success: true,
-            categories,
+            brands,
         });
     }
     catch (error) {
         return next(error);
     }
 };
-//Revalidate on new,update or delete products and on New order
-export const getAllBrands = async (request, response, next) => {
+export const getCategoriesByBrand = async (request, response, next) => {
     try {
-        let brands;
-        if (nodeCache.has('brands')) {
-            brands = JSON.parse(nodeCache.get('brand'));
+        const { brand } = request.query;
+        let categories;
+        if (brand && brand !== '') {
+            categories = await Product.distinct('category', { brand });
         }
         else {
-            brands = await Product.distinct('brand');
-            nodeCache.set('brands', JSON.stringify(brands));
+            categories = await Product.distinct('category');
         }
         return response.status(200).json({
             success: true,
-            brands,
+            categories,
         });
     }
     catch (error) {
@@ -248,10 +246,10 @@ export const updateSingleProduct = async (request, response, next) => {
 };
 export const getSearchedProducts = async (request, response, next) => {
     try {
-        const { search, sort, category, price, brand } = request.query;
-        const page = Number(request.query.page) || 1;
+        const { search, sort, category, price, brand, page: queryPage, } = request.query;
+        const page = Number(queryPage) || 1;
         const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
-        const skip = Number(limit * (page - 1));
+        const skip = limit * (page - 1);
         const baseQuery = {};
         if (search) {
             baseQuery.title = {
@@ -270,14 +268,14 @@ export const getSearchedProducts = async (request, response, next) => {
         if (brand) {
             baseQuery.brand = brand;
         }
-        const [products, filteredOnlyProducts] = await Promise.all([
+        const [products, totalProducts] = await Promise.all([
             Product.find(baseQuery)
                 .sort(sort && { price: sort === 'asc' ? 1 : -1 })
                 .limit(limit)
                 .skip(skip),
-            Product.find(baseQuery),
+            Product.countDocuments(baseQuery),
         ]);
-        const totalPage = Math.ceil(filteredOnlyProducts.length / limit);
+        const totalPage = Math.ceil(totalProducts / limit);
         return response.status(200).json({
             success: true,
             products,

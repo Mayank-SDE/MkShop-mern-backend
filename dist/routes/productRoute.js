@@ -1,7 +1,7 @@
 import express from 'express';
 import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 import { multipleUpload } from '../middlewares/multer.js';
-import { deleteSingleProduct, getAllBrands, getAllCategories, getAllProducts, getLatestProducts, getSearchedProducts, getSingleProduct, newProduct, 
+import { deleteSingleProduct, getAllProducts, getBrandsByCategory, getCategoriesByBrand, getLatestProducts, getSearchedProducts, getSingleProduct, newProduct, 
 // postAllProducts,
 updateSingleProduct, } from '../controllers/productController.js';
 const router = express.Router();
@@ -13,12 +13,12 @@ router.post('/all', postAllProducts);
 router.post('/new', loggedInOnly, adminOnly, multipleUpload, newProduct);
 //route - /api/v1/product/latest
 router.get('/latest', getLatestProducts);
-//route - /api/v1/product/search with filters
-router.get('/search', getSearchedProducts);
+//route - /api/v1/product/all with filters
+router.get('/all', getSearchedProducts);
 //route - /api/v1/product/categories
-router.get('/categories', getAllCategories);
+router.get('/categories', getCategoriesByBrand);
 //route - /api/v1/product/brands
-router.get('/brands', getAllBrands);
+router.get('/brands', getBrandsByCategory);
 //route - /api/v1/product/admin-products
 router.get('/admin-products', loggedInOnly, adminOnly, getAllProducts);
 //route - /api/v1/product/:id
