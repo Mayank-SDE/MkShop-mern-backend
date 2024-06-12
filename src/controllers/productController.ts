@@ -169,7 +169,7 @@ export const getAllProducts = async (
     if (nodeCache.has('products')) {
       products = JSON.parse(nodeCache.get('products') as string);
     } else {
-      products = await Product.find({});
+      products = await Product.find().sort({ createdAt: -1 });
       nodeCache.set('products', JSON.stringify(products));
     }
 
@@ -309,16 +309,16 @@ export const updateSingleProduct = async (
       product.description = description;
     }
     if (price) {
-      product.price = price;
+      product.price = Number(price);
     }
     if (rating) {
-      product.rating = rating;
+      product.rating = Number(rating);
     }
     if (discountPercentage) {
-      product.discountPercentage = discountPercentage;
+      product.discountPercentage = Number(discountPercentage);
     }
     if (stock) {
-      product.stock = stock;
+      product.stock = Number(stock);
     }
     if (brand) {
       product.brand = brand;
