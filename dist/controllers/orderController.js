@@ -46,7 +46,7 @@ export const newOrder = async (request, response, next) => {
 };
 export const myOrders = async (request, response, next) => {
     try {
-        const id = request.query.id;
+        const id = request.query.userId;
         const key = `orders-${id}`;
         let orders = [];
         if (nodeCache.has(key)) {
@@ -117,17 +117,17 @@ export const processOrder = async (request, response, next) => {
             return next(new ErrorHandler('Order not found', 404));
         }
         switch (order.status) {
-            case 'picked':
-                order.status = 'packed';
+            case 'Placed':
+                order.status = 'Picked';
                 break;
-            case 'packed':
-                order.status = 'shipped';
+            case 'Picked':
+                order.status = 'Packed';
                 break;
-            case 'shipped':
-                order.status = 'delivered';
+            case 'Packed':
+                order.status = 'Shipped';
                 break;
             default:
-                order.status = 'delivered';
+                order.status = 'Delivered';
                 break;
         }
         await order.save();

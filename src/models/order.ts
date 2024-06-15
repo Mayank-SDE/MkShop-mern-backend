@@ -67,13 +67,14 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['placed', 'picked', 'packed', 'shipped', 'delivered'],
+      enum: ['Placed', 'Picked', 'Packed', 'Shipped', 'Delivered'],
       default: 'placed',
     },
     orderItems: [
       {
         title: String,
         price: Number,
+        thumbnail: String,
         quantity: {
           type: Number,
           required: [true, 'Please enter the quantity'],

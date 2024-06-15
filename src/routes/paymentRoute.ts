@@ -24,7 +24,7 @@ router.post('/coupon/new', loggedInOnly, adminOnly, createCoupon);
 //route -  /api/v1/payment/coupon/all
 router.get('/coupon/all', loggedInOnly, adminOnly, getAllCoupons);
 
-//route -  /api/v1/payment/coupon/id
+//route -  /api/v1/payment/coupon/:id
 router.delete('/coupon/:id', loggedInOnly, adminOnly, deleteCoupon);
 
 export default router;

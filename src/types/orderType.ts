@@ -3,13 +3,14 @@ export type OrderItemType = {
   price: number;
   quantity: number;
   productId: string;
+  thumbnail: string;
 };
 export type ShippingInfoType = {
   address: string;
   city: string;
   country: string;
   state: string;
-  pinCode: number;
+  pinCode: string;
   phoneNumber: string;
   email: string;
   billingName: string;
