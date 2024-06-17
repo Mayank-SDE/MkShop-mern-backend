@@ -409,10 +409,10 @@ export const getLineCharts = async (
   next: NextFunction
 ) => {
   try {
-    let barCharts = {};
+    let lineCharts = {};
     const key = 'admin-line-chart';
     if (nodeCache.has(key)) {
-      barCharts = JSON.parse(nodeCache.get(key) as string);
+      lineCharts = JSON.parse(nodeCache.get(key) as string);
     } else {
       const today = new Date();
 
@@ -458,18 +458,18 @@ export const getLineCharts = async (
         today,
         property: 'total',
       });
-      barCharts = {
+      lineCharts = {
         users: userCounts,
         products: productCounts,
         discount,
         revenue,
       };
-      nodeCache.set(key, JSON.stringify(barCharts));
+      nodeCache.set(key, JSON.stringify(lineCharts));
     }
 
     return response.status(200).json({
       success: true,
-      barCharts,
+      lineCharts,
     });
   } catch (error) {
     return next(error);

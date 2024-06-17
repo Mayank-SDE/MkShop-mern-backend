@@ -16,8 +16,8 @@ const router = express.Router();
 router.post('/create', loggedInOnly, createPaymentIntent);
 
 //route -  /api/v1/payment/discount
-router.get('/discount', applyDiscount);
-// router.get('/discount', loggedInOnly, applyDiscount);
+router.get('/discount', loggedInOnly, applyDiscount);
+
 //route -  /api/v1/payment/coupon/new
 router.post('/coupon/new', loggedInOnly, adminOnly, createCoupon);
 
