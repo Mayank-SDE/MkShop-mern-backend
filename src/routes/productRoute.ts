@@ -44,7 +44,8 @@ router
   .route('/:id')
   .get(getSingleProduct)
   .delete(loggedInOnly, adminOnly, deleteSingleProduct)
-  .put(loggedInOnly, adminOnly, multipleUpload, updateSingleProduct);
+  .put(multipleUpload, updateSingleProduct);
+// .put(loggedInOnly, adminOnly, multipleUpload, updateSingleProduct);
 
 //route - /api/v1/product/all
 // router.get('/all', getproducts);

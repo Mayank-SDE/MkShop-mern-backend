@@ -180,14 +180,25 @@ export const deleteSingleProduct = async (request, response, next) => {
 export const updateSingleProduct = async (request, response, next) => {
     try {
         const { title, description, price, rating, discountPercentage, stock, brand, category, } = request.body;
+        console.log('title', title);
+        console.log('description', description);
+        console.log('price', price);
+        console.log('rating', rating);
+        console.log('discountPercentage', discountPercentage);
+        console.log('stock', stock);
+        console.log('brand', brand);
+        console.log('category', category);
         const product = await Product.findById(request.params.id);
         if (!product) {
             return next(new ErrorHandler('Invalid product id', 404));
         }
         const files = request.files;
-        if (Array.isArray(files)) {
+        console.log('files', files);
+        if (Array.isArray(files) && files.length === 4) {
             const imagesPath = files?.map((file) => file.path);
+            console.log('imagesPath', imagesPath);
             if (imagesPath && imagesPath.length !== 4) {
+                console.log('imagesPath length', imagesPath.length);
                 imagesPath.map((path) => {
                     rm(path, () => {
                         console.log('Deleting unneccassary images from database.');
@@ -201,32 +212,41 @@ export const updateSingleProduct = async (request, response, next) => {
                         console.log('Old images deleted from database.');
                     });
                 });
+                console.log('images Updated');
                 product.images = imagesPath;
                 product.thumbnail = imagesPath[0];
             }
         }
         if (title) {
+            console.log('titleUpdated', title);
             product.title = title;
         }
         if (category) {
+            console.log('categoryUpdated', category);
             product.category = category;
         }
         if (description) {
+            console.log('descriptionUpdated', description);
             product.description = description;
         }
         if (price) {
+            console.log('priceUpdated', price);
             product.price = Number(price);
         }
         if (rating) {
+            console.log('ratingUpdated', rating);
             product.rating = Number(rating);
         }
         if (discountPercentage) {
+            console.log('discountPercentageUpdated', discountPercentage);
             product.discountPercentage = Number(discountPercentage);
         }
         if (stock) {
+            console.log('stockUpdated', stock);
             product.stock = Number(stock);
         }
         if (brand) {
+            console.log('brandUpdated', brand);
             product.brand = brand;
         }
         await product.save();

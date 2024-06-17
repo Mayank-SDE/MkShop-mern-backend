@@ -114,12 +114,35 @@ export const getAllUsers = async (
   next: NextFunction
 ) => {
   try {
+    /*
+      username: string;
+  email: string;
+  image: File | string | null;
+  gender: string;
+  role: string;
+  dob: string;
+  _id: string;
+  password: string;
+    */
     const users = await User.find({});
+
+    const allUsers = users.map((user) => {
+      return {
+        username: user.username,
+        email: user.email,
+        image: user.image,
+        gender: user.gender,
+        role: user.role,
+        dob: user.dob,
+        _id: user._id,
+        password: user.password,
+      };
+    });
 
     response.status(200).json({
       success: true,
       message: 'List of all users',
-      users,
+      users: allUsers,
     });
   } catch (error) {
     next(error);

@@ -64,7 +64,7 @@ export const getDashboardStats = async (request, response, next) => {
                 },
             });
             const latestTransactionPromise = Order.find({})
-                .select(['orderItems', 'discount', 'total', 'status'])
+                .select(['orderItems', 'discount', 'total', 'status', '_id'])
                 .limit(4);
             const [thisMonthProducts, thisMonthUsers, thisMonthOrders, lastMonthProducts, lastMonthUsers, lastMonthOrders, productsCount, usersCount, allOrders, lastSixMonthOrders, categories, femaleUsersCount, latestTransaction,] = await Promise.all([
                 thisMonthProductsPromise,
@@ -123,10 +123,11 @@ export const getDashboardStats = async (request, response, next) => {
             const modifyLatestTransaction = latestTransaction.map((transaction) => {
                 return {
                     _id: transaction._id,
-                    discoutn: transaction.discount,
-                    amount: transaction.total,
+                    discount: transaction.discount,
+                    total: transaction.total,
                     quantity: transaction.orderItems.length,
                     status: transaction.status,
+                    orderItems: transaction.orderItems,
                 };
             });
             stats = {
@@ -167,11 +168,11 @@ export const getPieCharts = async (request, response, next) => {
                 'shippingCharges',
             ]);
             const [placedOrders, pickedOrders, packedOrders, shippedOrders, deliveredOrders, categories, productsCount, productsInStock, allOrders, allUsers, customerCount, adminCount,] = await Promise.all([
-                Order.countDocuments({ status: 'placed' }),
-                Order.countDocuments({ status: 'picked' }),
-                Order.countDocuments({ status: 'packed' }),
-                Order.countDocuments({ status: 'shipped' }),
-                Order.countDocuments({ status: 'delivered' }),
+                Order.countDocuments({ status: 'Placed' }),
+                Order.countDocuments({ status: 'Picked' }),
+                Order.countDocuments({ status: 'Packed' }),
+                Order.countDocuments({ status: 'Shipped' }),
+                Order.countDocuments({ status: 'Delivered' }),
                 Product.distinct('category'),
                 Product.countDocuments({}),
                 Product.countDocuments({
