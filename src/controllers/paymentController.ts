@@ -83,6 +83,7 @@ export const getAllCoupons = async (
   try {
     const coupons = await Coupon.find({});
 
+    console.log(coupons);
     return response.status(200).json({
       success: true,
       coupons,

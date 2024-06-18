@@ -13,5 +13,5 @@ router
     .route('/:id')
     .get(loggedInOnly, getSingleOrder)
     .put(loggedInOnly, adminOnly, processOrder)
-    .delete(loggedInOnly, adminOnly, deleteOrder);
+    .delete(loggedInOnly, deleteOrder);
 export default router;

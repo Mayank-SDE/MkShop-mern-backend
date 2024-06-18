@@ -88,6 +88,7 @@ export const allOrders = async (request, response, next) => {
 export const getSingleOrder = async (request, response, next) => {
     try {
         const { id } = request.params;
+        console.log(id);
         const key = `order-${id}`;
         let order;
         if (nodeCache.has(key)) {

@@ -58,6 +58,7 @@ export const applyDiscount = async (request, response, next) => {
 export const getAllCoupons = async (request, response, next) => {
     try {
         const coupons = await Coupon.find({});
+        console.log(coupons);
         return response.status(200).json({
             success: true,
             coupons,

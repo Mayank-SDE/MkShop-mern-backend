@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { config } from 'dotenv';
 import { singleUpload } from '../middlewares/multer.js';
-import { deleteUser, getAllUsers, getLoginFailed, getLoginSuccess, getLogout, registerUser, updateUser, } from '../controllers/userController.js';
+import { deleteUser, getAllUsers, getLoginFailed, getLoginSuccess, getLogout, registerUser, updateUser, verifyUser, } from '../controllers/userController.js';
 import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
@@ -32,6 +32,8 @@ router.get('/github/callback', passport.authenticate('github', {
 }));
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
+// route  -  /auth/reset/password
+router.post('/reset/password', verifyUser);
 // route  -  /auth/login/failed
 router.get('/login/failed', getLoginFailed);
 // route - /auth/logout
@@ -42,11 +44,4 @@ router.get('/all', loggedInOnly, adminOnly, getAllUsers);
 router.put('/profile/update', loggedInOnly, singleUpload, updateUser);
 //route - /auth/profile/delete/:userId
 router.delete('/profile/delete/:userId', loggedInOnly, deleteUser);
-/*
-router
-  .route('/:userId')
-  .get(loggedInOnly, getSingleUser)
-  .delete(loggedInOnly, deleteUser)
-  .put(loggedInOnly, singleUpload, updateUser);
-*/
 export default router;

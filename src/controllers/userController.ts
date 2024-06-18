@@ -44,7 +44,7 @@ export const registerUser = async (
       email,
       gender,
       image: image?.path || 'assets/MK.png',
-      password: bcrypt.hashSync(password, 10),
+      password: bcrypt.hashSync(password, 12),
       dob: new Date(dob),
       role,
     });
@@ -212,6 +212,40 @@ export const getLoginFailed = (
     });
   } catch (error) {
     return next;
+  }
+};
+
+export const verifyUser = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    const { username, email, gender, dob, password } = request.body;
+    if (!username || !email || !gender || !dob) {
+      return next(new ErrorHandler('Enter all the fields correctly.', 400));
+    }
+    const user = await User.findOne({
+      username,
+      email,
+      dob: new Date(dob),
+      gender,
+    });
+    if (!user) {
+      return next(new ErrorHandler('No such user exists.', 404));
+    }
+    if (password) {
+      user.password = bcrypt.hashSync(password, 12);
+    }
+
+    user.save();
+    return response.status(200).json({
+      success: true,
+      user,
+      message: 'Please login with your new password.',
+    });
+  } catch (error) {
+    return next(error);
   }
 };
 

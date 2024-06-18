@@ -120,12 +120,14 @@ export const getSingleOrder = async (
 ) => {
   try {
     const { id } = request.params;
+    console.log(id);
     const key = `order-${id}`;
     let order;
     if (nodeCache.has(key)) {
       order = JSON.parse(nodeCache.get(key) as string);
     } else {
       order = await Order.findById(id);
+
       if (!order) {
         return next(new ErrorHandler('Order not found', 404));
       }
