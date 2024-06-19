@@ -43,7 +43,7 @@ router.get(
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    successRedirect: `https://mkshop-mern-backend.onrender.com/auth/login/success`,
+    successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
   })
 );
