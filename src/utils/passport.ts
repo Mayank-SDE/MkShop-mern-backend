@@ -150,12 +150,15 @@ passport.serializeUser((user, done) => {
 });
 
 //This deserializeUser will fetch the session object based on the session id that is stores inside the session object.
-passport.deserializeUser(async (_id, done) => {
+passport.deserializeUser(async (_id: string, done) => {
   try {
     const user = await User.findById(_id);
-    console.log('Deserialize user ', user);
+    if (!user) {
+      return done(new Error('User not found'));
+    }
+    console.log('Deserialize user:', user);
     done(null, user);
   } catch (err) {
-    done(err, null);
+    done(err);
   }
 });
