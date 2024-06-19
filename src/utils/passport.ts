@@ -51,7 +51,7 @@ passport.use(
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL:
-        'https://mkshop-mern-backend.onrender.com/auth/github/callback',
+        'https://mkshop-mern-backend.onrender.com/auth/google/callback',
     },
     async function (
       accessToken: string,
