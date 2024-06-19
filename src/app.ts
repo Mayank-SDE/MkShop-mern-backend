@@ -26,7 +26,7 @@ const MONGO_DB_NAME = process.env.MONGO_DB_NAME as string;
 const STRIPE_KEY = process.env.STRIPE_KEY as string;
 const SESSION_SECRET = process.env.SESSION_SECRET as string;
 const CLIENT_URL = process.env.CORS_ORIGIN as string;
-
+const NODE_ENV = process.env.NODE_ENV as string;
 export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 
@@ -37,9 +37,9 @@ app.use(
   session({
     secret: SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
-      secure: true,
+      secure: NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
@@ -78,7 +78,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(morgan('dev'));
-app.set('trust proxy', 1);
+
 // Health check route
 app.get('/', (req, res) => {
   res.status(200).json({

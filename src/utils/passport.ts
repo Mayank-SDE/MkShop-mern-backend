@@ -14,6 +14,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { config } from 'dotenv';
 import { User, UserInterface } from '../models/user.js';
 import { compareSync, hashSync } from 'bcrypt';
+import mongoose from 'mongoose';
 
 config();
 
@@ -150,11 +151,12 @@ passport.serializeUser((user, done) => {
 });
 
 //This deserializeUser will fetch the session object based on the session id that is stores inside the session object.
-
 passport.deserializeUser(async (_id: string, done) => {
   try {
-    console.log('Deserialize User ID:', _id);
-    const user = await User.findById(_id);
+    console.log('Deserialize User ID (before conversion):', _id);
+    const objectId = new mongoose.Types.ObjectId(_id);
+    console.log('Deserialize User ID (after conversion):', objectId);
+    const user = await User.findById(objectId);
     console.log('Found User:', user);
     if (!user) {
       return done(new Error('User not found'));
