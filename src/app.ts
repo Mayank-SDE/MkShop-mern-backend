@@ -87,6 +87,23 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
   next();
 });
 */
+// Middleware to handle session storage
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  if (req.session && req.session.userId) {
+    // Ensure req.session.userId is checked for existence
+    try {
+      const session = await Session.findOne({ sessionId: req.session.userId });
+      if (session) {
+        // Cast session.userId as mongoose.Types.ObjectId to satisfy TypeScript
+        req.user = (await User.findById(session.userId)) as UserInterface;
+      }
+    } catch (error) {
+      console.error('Error finding session:', error);
+    }
+  }
+  next();
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 
