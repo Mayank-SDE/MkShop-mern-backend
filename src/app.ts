@@ -12,12 +12,16 @@ import authRoute from './routes/authRoute.js';
 import mongoDBConnect from './utils/database.js';
 import cors from 'cors';
 import passport from 'passport';
-import session from 'express-session';
+// import session from 'express-session';
+import cookieSession from 'cookie-session';
 import morgan from 'morgan';
 import './utils/passport.js';
-import MongoStore from 'connect-mongo';
+// import MongoStore from 'connect-mongo';
 // Importing middlewares
 import { errorMiddleware } from './middlewares/error.js';
+import mongoose from 'mongoose';
+import { User, UserInterface } from './models/user.js';
+import { Session } from './models/session.js';
 
 dotenv.config();
 
@@ -32,6 +36,7 @@ export const nodeCache = new NodeCache();
 
 const app = express();
 
+/*
 // Session configuration
 app.use(
   session({
@@ -51,11 +56,37 @@ app.use(
       autoRemoveInterval: 10,
     }),
   })
-);
+);*/
 
 // Database connection
 mongoDBConnect(MONGO_URI, MONGO_DB_NAME);
 
+// Cookie session configuration
+app.use(
+  cookieSession({
+    name: 'session',
+    keys: [SESSION_SECRET],
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    secure: true, // Set to true in production
+    httpOnly: true,
+  })
+);
+/*
+// Middleware to handle session storage
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  if (req.session && req.session.userId) {
+    try {
+      const session = await Session.findOne({ sessionId: req.session.userId });
+      if (session) {
+        req.user = (await User.findById(session.userId)) as UserInterface;
+      }
+    } catch (error) {
+      console.error('Error finding session:', error);
+    }
+  }
+  next();
+});
+*/
 app.use(passport.initialize());
 app.use(passport.session());
 

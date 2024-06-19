@@ -255,7 +255,7 @@ export const getLoginSuccess = (
   next: NextFunction
 ) => {
   try {
-    console.log('login success', request.isAuthenticated);
+    console.log('login success', request.isAuthenticated());
     console.log('login success', request.user);
     console.log('Login success endpoint hit');
     console.log('Request headers:', request.headers);
