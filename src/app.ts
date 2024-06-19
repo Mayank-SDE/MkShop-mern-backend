@@ -32,9 +32,6 @@ export const nodeCache = new NodeCache();
 
 const app = express();
 
-// Database connection
-mongoDBConnect(MONGO_URI, MONGO_DB_NAME);
-
 // Session configuration
 app.use(
   session({
@@ -55,6 +52,9 @@ app.use(
     }),
   })
 );
+
+// Database connection
+mongoDBConnect(MONGO_URI, MONGO_DB_NAME);
 
 app.use(passport.initialize());
 app.use(passport.session());
