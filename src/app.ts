@@ -78,7 +78,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(morgan('dev'));
-
+app.set('trust proxy', 1);
 // Health check route
 app.get('/', (req, res) => {
   res.status(200).json({
