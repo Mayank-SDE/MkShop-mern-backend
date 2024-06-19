@@ -256,7 +256,6 @@ export const getLoginSuccess = (
 ) => {
   try {
     if (!request.user) {
-      console.log('user not found');
       return next(new ErrorHandler('User not logged in.', 400));
     }
     console.log(request.user);

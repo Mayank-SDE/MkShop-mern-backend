@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import NodeCache from 'node-cache';
 import Stripe from 'stripe';
 // Importing Routes
-import userRoute from './routes/userRoute.js';
 import productRoute from './routes/productRoute.js';
 import orderRoute from './routes/orderRoute.js';
 import paymentRoute from './routes/paymentRoute.js';
@@ -69,8 +68,6 @@ app.get('/', (req, res) => {
 });
 // Routes for client authentication using social login
 app.use('/auth', authRoute);
-// Routes for user management
-app.use('/api/v1/user', userRoute);
 // Routes for products
 app.use('/api/v1/product', productRoute);
 // Routes for new orders
