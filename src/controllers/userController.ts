@@ -257,7 +257,9 @@ export const getLoginSuccess = (
   try {
     console.log('login success', request.isAuthenticated);
     console.log('login success', request.user);
-
+    console.log('Login success endpoint hit');
+    console.log('Request headers:', request.headers);
+    console.log('Request body:', request.body);
     if (!request.user) {
       return next(new ErrorHandler('User not logged in.', 400));
     }
