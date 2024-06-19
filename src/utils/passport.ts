@@ -15,7 +15,6 @@ import { config } from 'dotenv';
 import { User, UserInterface } from '../models/user.js';
 import { compareSync, hashSync } from 'bcrypt';
 import mongoose from 'mongoose';
-import { Session } from '../models/session.js';
 
 config();
 
@@ -144,30 +143,6 @@ passport.use(
   )
 );
 
-passport.serializeUser((user, done) => {
-  console.log('serialize user user id', user);
-  const sessionId = (user as UserInterface)._id as string;
-  Session.create({ sessionId: sessionId, userId: (user as UserInterface)._id });
-  done(null, sessionId);
-});
-
-passport.deserializeUser(async (sessionId: string, done) => {
-  try {
-    console.log('Deserialize User ID:', sessionId);
-    const session = await Session.findOne({ sessionId: sessionId });
-    if (!session) {
-      return done(new Error('Session not found'));
-    }
-    const user = await User.findById(session.userId);
-    if (!user) {
-      return done(new Error('User not found'));
-    }
-    done(null, user);
-  } catch (error) {
-    done(error, false);
-  }
-});
-/*
 //This will persist the user data inside the session.
 //This serializeUser method will persist the session object user data. When we are login in using the username and password.
 passport.serializeUser((user, done) => {
@@ -192,4 +167,3 @@ passport.deserializeUser(async (_id: string, done) => {
     done(err);
   }
 });
-*/
