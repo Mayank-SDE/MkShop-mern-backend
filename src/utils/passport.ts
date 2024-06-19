@@ -145,6 +145,7 @@ passport.use(
 //This will persist the user data inside the session.
 //This serializeUser method will persist the session object user data. When we are login in using the username and password.
 passport.serializeUser((user, done) => {
+  console.log('serialize user user id', user);
   done(null, (user as UserInterface)._id as string);
 });
 
@@ -152,7 +153,7 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (_id, done) => {
   try {
     const user = await User.findById(_id);
-
+    console.log('Deserialize user ', user);
     done(null, user);
   } catch (err) {
     done(err, null);
