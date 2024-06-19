@@ -80,9 +80,10 @@ passport.use(
             gender: 'male',
           });
           newUser.save();
-
+          console.log('new user', newUser);
           return done(null, newUser);
         }
+        console.log('already ', user);
 
         done(null, user);
       } catch (error) {
