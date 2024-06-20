@@ -13,10 +13,10 @@ import {
 import { Strategy as LocalStrategy } from 'passport-local';
 import { config } from 'dotenv';
 import { User, UserInterface } from '../models/user.js';
-import { compareSync, hashSync } from 'bcrypt';
 import mongoose from 'mongoose';
 import ErrorHandler from './utilityClass.js';
 import { comparePassword, hashPassword } from './password.js';
+import { request } from 'express';
 
 config();
 
@@ -47,6 +47,12 @@ passport.use(
         return done(new ErrorHandler('Incorrect password', 404), false);
       }
       console.log('user from passport local', user);
+      request.logIn(user, (err) => {
+        if (err) {
+          return done(err, false);
+        }
+        return done(null, user as UserInterface);
+      });
       done(null, user);
     } catch (err) {
       console.log('error from passport local', err);
@@ -88,12 +94,24 @@ passport.use(
             role: 'user',
             gender: 'male',
           });
-          newUser.save();
+          await newUser.save();
+          // Call req.logIn to establish the session after successful authentication
+          request.logIn(newUser, (err) => {
+            if (err) {
+              return done(err, false);
+            }
+            return done(null, newUser);
+          });
           console.log('new user', newUser);
           return done(null, newUser);
         }
         console.log('already ', user);
-
+        request.logIn(user, (err) => {
+          if (err) {
+            return done(err, false);
+          }
+          return done(null, user as UserInterface);
+        });
         done(null, user);
       } catch (error) {
         done(error, false);
@@ -138,10 +156,23 @@ passport.use(
             email: `${profile.username}@gmail.com`,
           });
 
-          newUser.save();
+          await newUser.save();
+          // Call req.logIn to establish the session after successful authentication
+          request.logIn(newUser, (err) => {
+            if (err) {
+              return done(err, false);
+            }
+            return done(null, newUser);
+          });
 
           return done(null, newUser);
         }
+        request.logIn(user, (err) => {
+          if (err) {
+            return done(err, false);
+          }
+          return done(null, user as UserInterface);
+        });
         done(null, user);
       } catch (error) {
         done(error, false);
