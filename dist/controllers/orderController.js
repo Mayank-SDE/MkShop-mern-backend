@@ -5,8 +5,22 @@ import ErrorHandler from '../utils/utilityClass.js';
 import { nodeCache } from '../app.js';
 export const newOrder = async (request, response, next) => {
     try {
-        const { shippingInfo, user, status, tax, shippingCharges, subTotal, total, discount, orderItems, } = request.body;
+        /*
         console.log(orderItems);
+        for (let i = 0; i < orderItems.length; i++) {
+          const product = await Product.findById(
+            new mongoose.Types.ObjectId(orderItems[i].productId)
+          );
+          if (!product) {
+            return next(new ErrorHandler('Sorry, no product found.', 400));
+          }
+          console.log('product stock', product.stock);
+          console.log('Order items quantity ', orderItems[i].quantity);
+          product.stock -= orderItems[i].quantity as number;
+          product?.save();
+        }
+         */
+        const { shippingInfo, user, status, tax, shippingCharges, subTotal, total, discount, orderItems, } = request.body;
         if (!shippingInfo ||
             !user ||
             !status ||

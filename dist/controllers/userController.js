@@ -1,8 +1,9 @@
 import { User } from '../models/user.js';
-import bcrypt from 'bcrypt';
 import ErrorHandler from '../utils/utilityClass.js';
 import { rm } from 'fs';
 import mongoose from 'mongoose';
+import { hashPassword } from '../utils/password.js';
+import { CLIENT_URL } from '../routes/authRoute.js';
 export const registerUser = async (request, response, next) => {
     try {
         const { username, email, gender, password, dob, role } = request.body;
@@ -25,7 +26,7 @@ export const registerUser = async (request, response, next) => {
             email,
             gender,
             image: image?.path || 'assets/MK.png',
-            password: bcrypt.hashSync(password, 12),
+            password: await hashPassword(password),
             dob: new Date(dob),
             role,
         });
@@ -59,7 +60,12 @@ export const updateUser = async (request, response, next) => {
             user.email = email;
         }
         if (password) {
-            user.password = bcrypt.hashSync(password, 12);
+            try {
+                user.password = (await hashPassword(password));
+            }
+            catch (error) {
+                return next(error);
+            }
         }
         if (dob) {
             user.dob = dob;
@@ -80,16 +86,6 @@ export const updateUser = async (request, response, next) => {
 };
 export const getAllUsers = async (request, response, next) => {
     try {
-        /*
-          username: string;
-      email: string;
-      image: File | string | null;
-      gender: string;
-      role: string;
-      dob: string;
-      _id: string;
-      password: string;
-        */
         const users = await User.find({});
         const allUsers = users.map((user) => {
             return {
@@ -152,10 +148,11 @@ export const getSingleUser = async (request, response, next) => {
 };
 export const getLoginFailed = (request, response, next) => {
     try {
-        return response.status(400).json({
-            success: false,
-            message: 'Not able to log in. Try again later.',
-        });
+        response.redirect(`${CLIENT_URL}`);
+        // return response.status(400).json({
+        //   success: false,
+        //   message: 'Not able to log in. Try again later.',
+        // });
     }
     catch (error) {
         return next;
@@ -177,7 +174,12 @@ export const verifyUser = async (request, response, next) => {
             return next(new ErrorHandler('No such user exists.', 404));
         }
         if (password) {
-            user.password = bcrypt.hashSync(password, 12);
+            try {
+                user.password = (await hashPassword(password));
+            }
+            catch (error) {
+                return next(error);
+            }
         }
         user.save();
         return response.status(200).json({
@@ -192,8 +194,12 @@ export const verifyUser = async (request, response, next) => {
 };
 export const getLoginSuccess = (request, response, next) => {
     try {
+        console.log('login success', request.isAuthenticated());
+        console.log('login success', request.user);
+        console.log('Login success endpoint hit');
+        console.log('Request headers:', request.headers);
+        console.log('Request body:', request.body);
         if (!request.user) {
-            console.log('user not found');
             return next(new ErrorHandler('User not logged in.', 400));
         }
         console.log(request.user);
@@ -230,7 +236,7 @@ export const getLogout = (request, response, next) => {
                 if (err) {
                     return next(err);
                 }
-                response.clearCookie('connect.sid'); // Ensure this matches your session cookie name
+                response.clearCookie('connect.sid');
                 return response.status(202).json({
                     success: true,
                     message: 'Logged out successfully.',

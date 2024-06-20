@@ -4,26 +4,37 @@ import { Strategy as GitHubStrategy, } from 'passport-github2';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { config } from 'dotenv';
 import { User } from '../models/user.js';
-import { compareSync, hashSync } from 'bcrypt';
+import mongoose from 'mongoose';
+import ErrorHandler from './utilityClass.js';
+import { comparePassword, hashPassword } from './password.js';
 config();
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 passport.use(new LocalStrategy(async function (username, password, done) {
+    console.log('username', username);
+    console.log('password', password);
     try {
         const user = await User.findOne({
             username: username,
         });
         if (!user) {
-            return done(null, false, { message: 'Incorrect username.' });
+            return done(new ErrorHandler('Incorrect username', 404), false);
         }
-        if (!compareSync(password, user.password)) {
-            return done(null, false, { message: 'Incorrect password.' });
+        const match = comparePassword(password, user.password);
+        const generatedPassword = await hashPassword(password);
+        console.log('entered password', generatedPassword);
+        console.log('database password', user.password);
+        console.log('Comparing password', match);
+        if (!match) {
+            return done(new ErrorHandler('Incorrect password', 404), false);
         }
+        console.log('user from passport local', user);
         done(null, user);
     }
     catch (err) {
+        console.log('error from passport local', err);
         done(err, false);
     }
 }));
@@ -47,14 +58,16 @@ passport.use(new GoogleStrategy({
                 username: profile.displayName,
                 email: profile.emails ? profile.emails[0].value : '',
                 image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
-                password: hashSync(profile.id, 12),
+                password: await hashPassword(profile.id),
                 dob: new Date('01/01/2000'),
                 role: 'user',
                 gender: 'male',
             });
             newUser.save();
+            console.log('new user', newUser);
             return done(null, newUser);
         }
+        console.log('already ', user);
         done(null, user);
     }
     catch (error) {
@@ -82,7 +95,7 @@ passport.use(new GitHubStrategy({
                 username: profile.username,
                 githubProfileURL: profile.profileUrl,
                 image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
-                password: hashSync(profile.id, 12),
+                password: await hashPassword(profile.id),
                 dob: new Date('01/01/2000'),
                 role: 'user',
                 gender: 'male',
@@ -100,15 +113,24 @@ passport.use(new GitHubStrategy({
 //This will persist the user data inside the session.
 //This serializeUser method will persist the session object user data. When we are login in using the username and password.
 passport.serializeUser((user, done) => {
+    console.log('serialize user user id', user);
     done(null, user._id);
 });
 //This deserializeUser will fetch the session object based on the session id that is stores inside the session object.
 passport.deserializeUser(async (_id, done) => {
     try {
-        const user = await User.findById(_id);
+        console.log('Deserialize User ID (before conversion):', _id);
+        const objectId = new mongoose.Types.ObjectId(_id);
+        console.log('Deserialize User ID (after conversion):', objectId);
+        const user = await User.findById(objectId);
+        console.log('Found User:', user);
+        if (!user) {
+            return done(new Error('User not found'));
+        }
         done(null, user);
     }
     catch (err) {
-        done(err, null);
+        console.error('Error in deserializeUser:', err);
+        done(err);
     }
 });

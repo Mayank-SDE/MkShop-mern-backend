@@ -15,6 +15,8 @@ import { config } from 'dotenv';
 import { User, UserInterface } from '../models/user.js';
 import { compareSync, hashSync } from 'bcrypt';
 import mongoose from 'mongoose';
+import ErrorHandler from './utilityClass.js';
+import { comparePassword, hashPassword } from './password.js';
 
 config();
 
@@ -26,21 +28,28 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET as string;
 
 passport.use(
   new LocalStrategy(async function (username, password, done) {
+    console.log('username', username);
+    console.log('password', password);
     try {
       const user: UserInterface | null = await User.findOne({
         username: username,
       });
 
       if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
+        return done(new ErrorHandler('Incorrect username', 404), false);
       }
-
-      if (!compareSync(password, user.password)) {
-        return done(null, false, { message: 'Incorrect password.' });
+      const match = comparePassword(password, user.password);
+      const generatedPassword = await hashPassword(password);
+      console.log('entered password', generatedPassword);
+      console.log('database password', user.password);
+      console.log('Comparing password', match);
+      if (!match) {
+        return done(new ErrorHandler('Incorrect password', 404), false);
       }
-
+      console.log('user from passport local', user);
       done(null, user);
     } catch (err) {
+      console.log('error from passport local', err);
       done(err, false);
     }
   })
@@ -51,8 +60,7 @@ passport.use(
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL:
-        'https://mkshop-mern-backend.onrender.com/auth/google/callback',
+      callbackURL: '/auth/google/callback',
     },
     async function (
       accessToken: string,
@@ -75,7 +83,7 @@ passport.use(
             username: profile.displayName,
             email: profile.emails ? profile.emails[0].value : '',
             image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
-            password: hashSync(profile.id, 12),
+            password: await hashPassword(profile.id),
             dob: new Date('01/01/2000'),
             role: 'user',
             gender: 'male',
@@ -99,8 +107,7 @@ passport.use(
     {
       clientID: GITHUB_CLIENT_ID,
       clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL:
-        'https://mkshop-mern-backend.onrender.com/auth/github/callback',
+      callbackURL: '/auth/github/callback',
     },
     async function (
       accessToken: string,
@@ -124,7 +131,7 @@ passport.use(
             username: profile.username,
             githubProfileURL: profile.profileUrl,
             image: profile.photos ? profile.photos[0].value : 'assets/MK.png',
-            password: hashSync(profile.id, 12),
+            password: await hashPassword(profile.id),
             dob: new Date('01/01/2000'),
             role: 'user',
             gender: 'male',

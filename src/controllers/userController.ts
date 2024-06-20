@@ -10,10 +10,11 @@ import {
   UpdateUserRequestBody,
 } from '../types/userType.js';
 
-import bcrypt from 'bcrypt';
 import ErrorHandler from '../utils/utilityClass.js';
 import { rm } from 'fs';
 import mongoose from 'mongoose';
+import { hashPassword } from '../utils/password.js';
+import { CLIENT_URL } from '../routes/authRoute.js';
 
 export const registerUser = async (
   request: Request<{}, {}, NewUserRequestBody>,
@@ -44,7 +45,7 @@ export const registerUser = async (
       email,
       gender,
       image: image?.path || 'assets/MK.png',
-      password: bcrypt.hashSync(password, 12),
+      password: await hashPassword(password),
       dob: new Date(dob),
       role,
     });
@@ -88,7 +89,11 @@ export const updateUser = async (
       user.email = email;
     }
     if (password) {
-      user.password = bcrypt.hashSync(password, 12);
+      try {
+        user.password = (await hashPassword(password)) as string;
+      } catch (error: any) {
+        return next(error);
+      }
     }
     if (dob) {
       user.dob = dob;
@@ -114,16 +119,6 @@ export const getAllUsers = async (
   next: NextFunction
 ) => {
   try {
-    /*
-      username: string;
-  email: string;
-  image: File | string | null;
-  gender: string;
-  role: string;
-  dob: string;
-  _id: string;
-  password: string;
-    */
     const users = await User.find({});
 
     const allUsers = users.map((user) => {
@@ -206,10 +201,11 @@ export const getLoginFailed = (
   next: NextFunction
 ) => {
   try {
-    return response.status(400).json({
-      success: false,
-      message: 'Not able to log in. Try again later.',
-    });
+    response.redirect(`${CLIENT_URL}`);
+    // return response.status(400).json({
+    //   success: false,
+    //   message: 'Not able to log in. Try again later.',
+    // });
   } catch (error) {
     return next;
   }
@@ -235,7 +231,11 @@ export const verifyUser = async (
       return next(new ErrorHandler('No such user exists.', 404));
     }
     if (password) {
-      user.password = bcrypt.hashSync(password, 12);
+      try {
+        user.password = (await hashPassword(password)) as string;
+      } catch (error: any) {
+        return next(error);
+      }
     }
 
     user.save();
@@ -313,7 +313,7 @@ export const getLogout = (
         if (err) {
           return next(err);
         }
-        response.clearCookie('connect.sid'); // Ensure this matches your session cookie name
+        response.clearCookie('connect.sid');
         return response.status(202).json({
           success: true,
           message: 'Logged out successfully.',

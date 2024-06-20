@@ -19,7 +19,7 @@ import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
 
-const CLIENT_URL = process.env.CLIENT_URL as string;
+export const CLIENT_URL = process.env.CLIENT_URL as string;
 
 // route  -  /auth/register
 router.post('/register', singleUpload, registerUser);

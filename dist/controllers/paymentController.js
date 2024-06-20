@@ -3,7 +3,7 @@ import ErrorHandler from '../utils/utilityClass.js';
 import { stripe } from '../app.js';
 export const createPaymentIntent = async (request, response, next) => {
     try {
-        const { amount } = request.body;
+        const { amount, discount } = request.body;
         if (!amount) {
             return next(new ErrorHandler('Please enter the amount.', 400));
         }
@@ -14,6 +14,7 @@ export const createPaymentIntent = async (request, response, next) => {
         return response.status(200).json({
             success: true,
             clientSecret: paymentIntent.client_secret,
+            discount,
         });
     }
     catch (error) {

@@ -12,12 +12,14 @@ import authRoute from './routes/authRoute.js';
 import mongoDBConnect from './utils/database.js';
 import cors from 'cors';
 import passport from 'passport';
+// import session from 'express-session';
 import session from 'express-session';
 import morgan from 'morgan';
 import './utils/passport.js';
-import MongoStore from 'connect-mongo';
+// import MongoStore from 'connect-mongo';
 // Importing middlewares
 import { errorMiddleware } from './middlewares/error.js';
+import MongoStore from 'connect-mongo';
 dotenv.config();
 const MONGO_URI = process.env.MONGO_DB_URI;
 const MONGO_DB_NAME = process.env.MONGO_DB_NAME;
@@ -27,8 +29,6 @@ const CLIENT_URL = process.env.CORS_ORIGIN;
 export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 const app = express();
-// Database connection
-mongoDBConnect(MONGO_URI, MONGO_DB_NAME);
 // Session configuration
 app.use(session({
     secret: SESSION_SECRET,
@@ -47,6 +47,8 @@ app.use(session({
         autoRemoveInterval: 10,
     }),
 }));
+// Database connection
+mongoDBConnect(MONGO_URI, MONGO_DB_NAME);
 app.use(passport.initialize());
 app.use(passport.session());
 // CORS configuration
@@ -55,9 +57,14 @@ app.use(cors({
     methods: 'GET,POST,PUT,PATCH,DELETE',
     credentials: true,
 }));
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static('assets'));
+app.use((req, res, next) => {
+    console.log('Session:', req.session);
+    console.log('User:', req.user);
+    next();
+});
 app.use(morgan('dev'));
 // Health check route
 app.get('/', (req, res) => {

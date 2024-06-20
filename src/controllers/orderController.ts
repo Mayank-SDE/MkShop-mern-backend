@@ -5,6 +5,8 @@ import { reduceStock } from '../utils/reduceStock.js';
 import { invalidateCache } from '../utils/invalidateCache.js';
 import ErrorHandler from '../utils/utilityClass.js';
 import { nodeCache } from '../app.js';
+import { Product } from '../models/product.js';
+import mongoose from 'mongoose';
 
 export const newOrder = async (
   request: Request<{}, {}, NewOrderRequestBody>,
@@ -12,6 +14,21 @@ export const newOrder = async (
   next: NextFunction
 ) => {
   try {
+    /*
+    console.log(orderItems);
+    for (let i = 0; i < orderItems.length; i++) {
+      const product = await Product.findById(
+        new mongoose.Types.ObjectId(orderItems[i].productId)
+      );
+      if (!product) {
+        return next(new ErrorHandler('Sorry, no product found.', 400));
+      }
+      console.log('product stock', product.stock);
+      console.log('Order items quantity ', orderItems[i].quantity);
+      product.stock -= orderItems[i].quantity as number;
+      product?.save();
+    }
+     */
     const {
       shippingInfo,
       user,
@@ -23,7 +40,6 @@ export const newOrder = async (
       discount,
       orderItems,
     } = request.body;
-    console.log(orderItems);
 
     if (
       !shippingInfo ||

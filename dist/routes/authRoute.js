@@ -6,7 +6,7 @@ import { deleteUser, getAllUsers, getLoginFailed, getLoginSuccess, getLogout, re
 import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
-const CLIENT_URL = process.env.CLIENT_URL;
+export const CLIENT_URL = process.env.CLIENT_URL;
 // route  -  /auth/register
 router.post('/register', singleUpload, registerUser);
 // route  -  /auth/login

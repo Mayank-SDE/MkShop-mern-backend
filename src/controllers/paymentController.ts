@@ -9,7 +9,7 @@ export const createPaymentIntent = async (
   next: NextFunction
 ) => {
   try {
-    const { amount } = request.body;
+    const { amount, discount } = request.body;
     if (!amount) {
       return next(new ErrorHandler('Please enter the amount.', 400));
     }
@@ -21,6 +21,7 @@ export const createPaymentIntent = async (
     return response.status(200).json({
       success: true,
       clientSecret: paymentIntent.client_secret,
+      discount,
     });
   } catch (error) {
     return next(error);

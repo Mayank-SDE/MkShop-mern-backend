@@ -71,7 +71,7 @@ export const newProduct = async (
       rating: Number(rating),
       discountPercentage: Number(discountPercentage),
       stock: Number(stock),
-      brand: category.trim().replace(/\s+/g, '-').toUpperCase(),
+      brand: brand.trim().replace(/\s+/g, '-').toUpperCase(),
       category: category.trim().replace(/\s+/g, '-').toUpperCase(),
       thumbnail: imagesPath[0],
       images: imagesPath,
