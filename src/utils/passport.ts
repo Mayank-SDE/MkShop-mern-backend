@@ -24,7 +24,12 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID as string;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET as string;
 
 passport.use(
-  new LocalStrategy(async function (username, password, done) {
+  new LocalStrategy({ passReqToCallback: true }, async function (
+    req,
+    username,
+    password,
+    done
+  ) {
     try {
       const user: UserInterface | null = await User.findOne({ username });
 
@@ -37,7 +42,12 @@ passport.use(
         return done(new ErrorHandler('Incorrect password', 404), false);
       }
 
-      return done(null, user);
+      req.logIn(user, (err) => {
+        if (err) {
+          return done(err);
+        }
+        return done(null, user);
+      });
     } catch (err) {
       return done(err);
     }
