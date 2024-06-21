@@ -8,6 +8,7 @@ import {
   deleteUser,
   getAllUsers,
   getLoginFailed,
+  getLoginNotify,
   getLoginSuccess,
   getLogout,
   getSingleUser,
@@ -75,6 +76,9 @@ router.get(
 
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
+
+// route  -  /auth/login/success
+router.get('/login/notify', getLoginNotify);
 
 // route  -  /auth/reset/password
 router.post('/reset/password', verifyUser);

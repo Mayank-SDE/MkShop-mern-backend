@@ -299,6 +299,21 @@ export const getLoginSuccess = (
   }
 };
 
+export const getLoginNotify = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    return response.status(200).json({
+      success: true,
+      message: 'Please login for better experience.',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const getLogout = (
   request: Request,
   response: Response,

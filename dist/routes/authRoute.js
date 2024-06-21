@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { config } from 'dotenv';
 import { singleUpload } from '../middlewares/multer.js';
-import { deleteUser, getAllUsers, getLoginFailed, getLoginSuccess, getLogout, registerUser, updateUser, verifyUser, } from '../controllers/userController.js';
+import { deleteUser, getAllUsers, getLoginFailed, getLoginNotify, getLoginSuccess, getLogout, registerUser, updateUser, verifyUser, } from '../controllers/userController.js';
 import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
@@ -38,6 +38,8 @@ router.get('/github/callback', passport.authenticate('github', {
 });
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
+// route  -  /auth/login/success
+router.get('/login/notify', getLoginNotify);
 // route  -  /auth/reset/password
 router.post('/reset/password', verifyUser);
 // route  -  /auth/login/failed
