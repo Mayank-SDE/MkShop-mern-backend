@@ -20,6 +20,7 @@ config();
 const router = express.Router();
 
 export const CLIENT_URL = process.env.CLIENT_URL as string;
+const LOGIN_URL = process.env.LOGIN_URL as string;
 
 // route  -  /auth/register
 router.post('/register', singleUpload, registerUser);
@@ -48,7 +49,7 @@ router.get(
     session: true,
   }),
   (requset, response) => {
-    response.redirect(`${CLIENT_URL}`);
+    response.redirect(`${LOGIN_URL}`);
   }
 );
 
@@ -69,7 +70,7 @@ router.get(
     session: true,
   }),
   (requset, response) => {
-    response.redirect(`${CLIENT_URL}`);
+    response.redirect(`${LOGIN_URL}`);
   }
 );
 
