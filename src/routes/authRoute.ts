@@ -8,9 +8,9 @@ import {
   deleteUser,
   getAllUsers,
   getLoginFailed,
+  getLoginLocalSuccess,
   getLoginSuccess,
   getLogout,
-  getSingleUser,
   registerUser,
   updateUser,
   verifyUser,
@@ -28,7 +28,7 @@ router.post('/register', singleUpload, registerUser);
 router.post(
   '/login',
   passport.authenticate('local', {
-    successRedirect: '/auth/login/success',
+    successRedirect: '/auth/login/local/success',
     failureRedirect: '/auth/login/failed',
   })
 );
@@ -69,6 +69,9 @@ router.get(
 
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
+
+// route  -  /auth/login/success
+router.get('/login/local/success', getLoginLocalSuccess);
 
 // route  -  /auth/reset/password
 router.post('/reset/password', verifyUser);

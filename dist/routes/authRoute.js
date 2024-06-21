@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { config } from 'dotenv';
 import { singleUpload } from '../middlewares/multer.js';
-import { deleteUser, getAllUsers, getLoginFailed, getLoginSuccess, getLogout, registerUser, updateUser, verifyUser, } from '../controllers/userController.js';
+import { deleteUser, getAllUsers, getLoginFailed, getLoginLocalSuccess, getLoginSuccess, getLogout, registerUser, updateUser, verifyUser, } from '../controllers/userController.js';
 import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
@@ -11,7 +11,7 @@ export const CLIENT_URL = process.env.CLIENT_URL;
 router.post('/register', singleUpload, registerUser);
 // route  -  /auth/login
 router.post('/login', passport.authenticate('local', {
-    successRedirect: '/auth/login/success',
+    successRedirect: '/auth/login/local/success',
     failureRedirect: '/auth/login/failed',
 }));
 // route  -  /auth/google
@@ -34,6 +34,8 @@ router.get('/github/callback', passport.authenticate('github', {
 }));
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
+// route  -  /auth/login/success
+router.get('/login/local/success', getLoginLocalSuccess);
 // route  -  /auth/reset/password
 router.post('/reset/password', verifyUser);
 // route  -  /auth/login/failed

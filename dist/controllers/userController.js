@@ -226,56 +226,40 @@ export const getLoginSuccess = (req, res, next) => {
         return next(error);
     }
 };
-/*
-export const getLoginSuccess = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  try {
-    console.log('login success', request.isAuthenticated());
-    console.log('login success', request.user);
-    console.log('Login success endpoint hit');
-    console.log('Request headers:', request.headers);
-    console.log('Request body:', request.body);
-    if (!request.user) {
-      return next(new ErrorHandler('User not logged in.', 400));
+export const getLoginLocalSuccess = (request, response, next) => {
+    try {
+        console.log('login success', request.isAuthenticated());
+        console.log('login success', request.user);
+        console.log('Login success endpoint hit');
+        console.log('Request headers:', request.headers);
+        console.log('Request body:', request.body);
+        if (!request.user) {
+            return next(new ErrorHandler('User not logged in.', 400));
+        }
+        console.log(request.user);
+        const { _id, username, image, role, email, password, gender, age, dob, createdAt, updatedAt, } = request.user;
+        return response.status(202).json({
+            success: true,
+            user: {
+                _id,
+                username,
+                image,
+                role,
+                email,
+                password,
+                gender,
+                age,
+                dob,
+                createdAt,
+                updatedAt,
+            },
+            message: 'Logged in successfully.',
+        });
     }
-    console.log(request.user);
-    const {
-      _id,
-      username,
-      image,
-      role,
-      email,
-      password,
-      gender,
-      age,
-      dob,
-      createdAt,
-      updatedAt,
-    } = request.user as UserInterface;
-    return response.status(202).json({
-      success: true,
-      user: {
-        _id,
-        username,
-        image,
-        role,
-        email,
-        password,
-        gender,
-        age,
-        dob,
-        createdAt,
-        updatedAt,
-      },
-      message: 'Logged in successfully.',
-    });
-  } catch (error) {
-    return next(error);
-  }
-};*/
+    catch (error) {
+        return next(error);
+    }
+};
 export const getLogout = (request, response, next) => {
     try {
         request.logout((logoutError) => {

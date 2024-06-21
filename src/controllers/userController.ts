@@ -301,8 +301,8 @@ export const getLoginSuccess = (
     return next(error);
   }
 };
-/*
-export const getLoginSuccess = (
+
+export const getLoginLocalSuccess = (
   request: Request,
   response: Response,
   next: NextFunction
@@ -350,7 +350,7 @@ export const getLoginSuccess = (
   } catch (error) {
     return next(error);
   }
-};*/
+};
 
 export const getLogout = (
   request: Request,
