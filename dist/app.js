@@ -29,14 +29,16 @@ const CLIENT_URL = process.env.CORS_ORIGIN;
 export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 const app = express();
+app.set('trust proxy', 1);
 // Session configuration
 app.use(session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false,
+        secure: true,
         httpOnly: true,
+        sameSite: 'none',
         maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
     store: MongoStore.create({
