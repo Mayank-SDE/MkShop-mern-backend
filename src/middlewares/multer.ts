@@ -1,12 +1,11 @@
 import fs from 'fs';
 import multer from 'multer';
 import { v4 as uuid } from 'uuid';
-import { Product } from '../models/product.js';
-import { User } from '../models/user.js';
+
 const storage = multer.diskStorage({
   destination(request, file, callback) {
     // Generate the destination directory path
-    let destinationDirectory = 'assets';
+    let destinationDirectory = './assets';
 
     if (!fs.existsSync(destinationDirectory)) {
       fs.mkdirSync(destinationDirectory, { recursive: true });
