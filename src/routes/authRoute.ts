@@ -47,8 +47,8 @@ router.get(
     failureRedirect: '/auth/login/failed',
     session: true,
   }),
-  (req, res) => {
-    res.redirect(`${CLIENT_URL}login/success`);
+  (requset, response) => {
+    response.redirect(`${CLIENT_URL}`);
   }
 );
 
@@ -64,10 +64,13 @@ router.get(
 router.get(
   '/github/callback',
   passport.authenticate('github', {
-    successRedirect: `${CLIENT_URL}login/success`,
+    // successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
     session: true,
-  })
+  }),
+  (requset, response) => {
+    response.redirect(`${CLIENT_URL}`);
+  }
 );
 
 // route  -  /auth/login/success

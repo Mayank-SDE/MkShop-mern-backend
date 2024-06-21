@@ -21,8 +21,8 @@ router.get('/google/callback', passport.authenticate('google', {
     // successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
     session: true,
-}), (req, res) => {
-    res.redirect(`${CLIENT_URL}login/success`);
+}), (requset, response) => {
+    response.redirect(`${CLIENT_URL}`);
 });
 // route  -  /auth/github
 router.get('/github', passport.authenticate('github', {
@@ -30,10 +30,12 @@ router.get('/github', passport.authenticate('github', {
 }));
 // route  -  /auth/github/callback
 router.get('/github/callback', passport.authenticate('github', {
-    successRedirect: `${CLIENT_URL}login/success`,
+    // successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
     session: true,
-}));
+}), (requset, response) => {
+    response.redirect(`${CLIENT_URL}`);
+});
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
 // route  -  /auth/reset/password
