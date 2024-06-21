@@ -60,7 +60,7 @@ router.get(
 router.get(
   '/github/callback',
   passport.authenticate('github', {
-    successRedirect: `${CLIENT_URL}login/success`,
+    successRedirect: `/auth/login/success`,
     failureRedirect: '/auth/login/failed',
   })
 );
