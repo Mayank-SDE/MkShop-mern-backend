@@ -45,6 +45,7 @@ router.get(
   passport.authenticate('google', {
     successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
+    session: true,
   })
 );
 
@@ -62,6 +63,7 @@ router.get(
   passport.authenticate('github', {
     successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
+    session: true,
   })
 );
 

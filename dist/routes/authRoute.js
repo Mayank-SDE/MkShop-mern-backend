@@ -20,6 +20,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 router.get('/google/callback', passport.authenticate('google', {
     successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
+    session: true,
 }));
 // route  -  /auth/github
 router.get('/github', passport.authenticate('github', {
@@ -29,6 +30,7 @@ router.get('/github', passport.authenticate('github', {
 router.get('/github/callback', passport.authenticate('github', {
     successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
+    session: true,
 }));
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
