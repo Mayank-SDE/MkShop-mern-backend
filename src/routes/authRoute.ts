@@ -48,7 +48,7 @@ router.get(
     session: true,
   }),
   (req, res) => {
-    res.redirect(`${CLIENT_URL}`);
+    res.redirect(`${CLIENT_URL}login/success`);
   }
 );
 

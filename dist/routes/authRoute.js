@@ -22,7 +22,7 @@ router.get('/google/callback', passport.authenticate('google', {
     failureRedirect: '/auth/login/failed',
     session: true,
 }), (req, res) => {
-    res.redirect(`${CLIENT_URL}`);
+    res.redirect(`${CLIENT_URL}login/success`);
 });
 // route  -  /auth/github
 router.get('/github', passport.authenticate('github', {
