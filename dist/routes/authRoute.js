@@ -18,9 +18,11 @@ router.post('/login', passport.authenticate('local', {
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 // route  -  /auth/google/callback
 router.get('/google/callback', passport.authenticate('google', {
-    successRedirect: `${CLIENT_URL}login/success`,
+    // successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
     session: true,
+}, (req, res) => {
+    res.redirect(`${CLIENT_URL}/login/success`);
 }));
 // route  -  /auth/github
 router.get('/github', passport.authenticate('github', {
