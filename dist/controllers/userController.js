@@ -247,7 +247,7 @@ export const getLogout = (request, response, next) => {
                 if (err) {
                     return next(err);
                 }
-                response.clearCookie('connect.sid');
+                response.clearCookie('connect.sid', { path: '/' });
                 return response.status(202).json({
                     success: true,
                     message: 'Logged out successfully.',
