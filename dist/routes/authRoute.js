@@ -7,7 +7,6 @@ import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
 export const CLIENT_URL = process.env.CLIENT_URL;
-const LOGIN_URL = process.env.LOGIN_URL;
 // route  -  /auth/register
 router.post('/register', singleUpload, registerUser);
 // route  -  /auth/login
@@ -23,7 +22,7 @@ router.get('/google/callback', passport.authenticate('google', {
     failureRedirect: '/auth/login/failed',
     session: true,
 }), (requset, response) => {
-    response.redirect(`${LOGIN_URL}`);
+    response.redirect(`${CLIENT_URL}`);
 });
 // route  -  /auth/github
 router.get('/github', passport.authenticate('github', {
@@ -35,7 +34,7 @@ router.get('/github/callback', passport.authenticate('github', {
     failureRedirect: '/auth/login/failed',
     session: true,
 }), (requset, response) => {
-    response.redirect(`${LOGIN_URL}`);
+    response.redirect(`${CLIENT_URL}`);
 });
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);

@@ -25,7 +25,7 @@ const MONGO_URI = process.env.MONGO_DB_URI;
 const MONGO_DB_NAME = process.env.MONGO_DB_NAME;
 const STRIPE_KEY = process.env.STRIPE_KEY;
 const SESSION_SECRET = process.env.SESSION_SECRET;
-const CLIENT_URL = process.env.CORS_ORIGIN;
+const CORS_ORIGIN = process.env.CORS_ORIGIN;
 export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 const app = express();
@@ -55,7 +55,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 // CORS configuration
 app.use(cors({
-    origin: CLIENT_URL,
+    origin: CORS_ORIGIN,
     methods: 'GET,POST,PUT,PATCH,DELETE',
     credentials: true,
 }));
