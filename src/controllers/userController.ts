@@ -248,7 +248,60 @@ export const verifyUser = async (
     return next(error);
   }
 };
+export const getLoginSuccess = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.user) {
+      return next(new ErrorHandler('User not logged in.', 400));
+    }
+    const {
+      _id,
+      username,
+      image,
+      role,
+      email,
+      password,
+      gender,
+      age,
+      dob,
+      createdAt,
+      updatedAt,
+    } = req.user as UserInterface;
 
+    const responsePayload = {
+      success: true,
+      user: {
+        _id,
+        username,
+        image,
+        role,
+        email,
+        password,
+        gender,
+        age,
+        dob,
+        createdAt,
+        updatedAt,
+      },
+      message: 'Logged in successfully.',
+    };
+
+    return res.status(202).send(`
+            <script>
+                window.opener.postMessage(${JSON.stringify(
+                  responsePayload
+                )}, "${CLIENT_URL}");
+                window.close();
+            </script>
+        `);
+  } catch (error) {
+    return next(error);
+  }
+};
+/*
 export const getLoginSuccess = (
   request: Request,
   response: Response,
@@ -297,22 +350,7 @@ export const getLoginSuccess = (
   } catch (error) {
     return next(error);
   }
-};
-
-export const getLoginNotify = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  try {
-    return response.status(200).json({
-      success: true,
-      message: 'Please login for better experience.',
-    });
-  } catch (error) {
-    return next(error);
-  }
-};
+};*/
 
 export const getLogout = (
   request: Request,

@@ -192,19 +192,13 @@ export const verifyUser = async (request, response, next) => {
         return next(error);
     }
 };
-export const getLoginSuccess = (request, response, next) => {
+export const getLoginSuccess = (req, res, next) => {
     try {
-        console.log('login success', request.isAuthenticated());
-        console.log('login success', request.user);
-        console.log('Login success endpoint hit');
-        console.log('Request headers:', request.headers);
-        console.log('Request body:', request.body);
-        if (!request.user) {
+        if (!req.user) {
             return next(new ErrorHandler('User not logged in.', 400));
         }
-        console.log(request.user);
-        const { _id, username, image, role, email, password, gender, age, dob, createdAt, updatedAt, } = request.user;
-        return response.status(202).json({
+        const { _id, username, image, role, email, password, gender, age, dob, createdAt, updatedAt, } = req.user;
+        const responsePayload = {
             success: true,
             user: {
                 _id,
@@ -220,23 +214,68 @@ export const getLoginSuccess = (request, response, next) => {
                 updatedAt,
             },
             message: 'Logged in successfully.',
-        });
+        };
+        return res.status(202).send(`
+            <script>
+                window.opener.postMessage(${JSON.stringify(responsePayload)}, "${CLIENT_URL}");
+                window.close();
+            </script>
+        `);
     }
     catch (error) {
         return next(error);
     }
 };
-export const getLoginNotify = (request, response, next) => {
-    try {
-        return response.status(200).json({
-            success: true,
-            message: 'Please login for better experience.',
-        });
+/*
+export const getLoginSuccess = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log('login success', request.isAuthenticated());
+    console.log('login success', request.user);
+    console.log('Login success endpoint hit');
+    console.log('Request headers:', request.headers);
+    console.log('Request body:', request.body);
+    if (!request.user) {
+      return next(new ErrorHandler('User not logged in.', 400));
     }
-    catch (error) {
-        return next(error);
-    }
-};
+    console.log(request.user);
+    const {
+      _id,
+      username,
+      image,
+      role,
+      email,
+      password,
+      gender,
+      age,
+      dob,
+      createdAt,
+      updatedAt,
+    } = request.user as UserInterface;
+    return response.status(202).json({
+      success: true,
+      user: {
+        _id,
+        username,
+        image,
+        role,
+        email,
+        password,
+        gender,
+        age,
+        dob,
+        createdAt,
+        updatedAt,
+      },
+      message: 'Logged in successfully.',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};*/
 export const getLogout = (request, response, next) => {
     try {
         request.logout((logoutError) => {

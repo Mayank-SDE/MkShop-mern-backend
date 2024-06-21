@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { config } from 'dotenv';
 import { singleUpload } from '../middlewares/multer.js';
-import { deleteUser, getAllUsers, getLoginFailed, getLoginNotify, getLoginSuccess, getLogout, registerUser, updateUser, verifyUser, } from '../controllers/userController.js';
+import { deleteUser, getAllUsers, getLoginFailed, getLoginSuccess, getLogout, registerUser, updateUser, verifyUser, } from '../controllers/userController.js';
 import { adminOnly, loggedInOnly } from '../middlewares/auth.js';
 config();
 const router = express.Router();
@@ -18,28 +18,22 @@ router.post('/login', passport.authenticate('local', {
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 // route  -  /auth/google/callback
 router.get('/google/callback', passport.authenticate('google', {
-    // successRedirect: `${CLIENT_URL}login/success`,
+    successRedirect: '/auth/login/success',
     failureRedirect: '/auth/login/failed',
     session: true,
-}), (requset, response) => {
-    response.redirect(`${CLIENT_URL}`);
-});
+}));
 // route  -  /auth/github
 router.get('/github', passport.authenticate('github', {
     scope: ['profile', 'email'],
 }));
 // route  -  /auth/github/callback
 router.get('/github/callback', passport.authenticate('github', {
-    // successRedirect: `${CLIENT_URL}login/success`,
+    successRedirect: `/auth/login/success`,
     failureRedirect: '/auth/login/failed',
     session: true,
-}), (requset, response) => {
-    response.redirect(`${CLIENT_URL}`);
-});
+}));
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
-// route  -  /auth/login/success
-router.get('/login/notify', getLoginNotify);
 // route  -  /auth/reset/password
 router.post('/reset/password', verifyUser);
 // route  -  /auth/login/failed

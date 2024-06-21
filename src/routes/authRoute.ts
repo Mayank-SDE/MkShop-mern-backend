@@ -8,7 +8,6 @@ import {
   deleteUser,
   getAllUsers,
   getLoginFailed,
-  getLoginNotify,
   getLoginSuccess,
   getLogout,
   getSingleUser,
@@ -44,13 +43,10 @@ router.get(
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    // successRedirect: `${CLIENT_URL}login/success`,
+    successRedirect: '/auth/login/success',
     failureRedirect: '/auth/login/failed',
     session: true,
-  }),
-  (requset, response) => {
-    response.redirect(`${CLIENT_URL}`);
-  }
+  })
 );
 
 // route  -  /auth/github
@@ -65,20 +61,14 @@ router.get(
 router.get(
   '/github/callback',
   passport.authenticate('github', {
-    // successRedirect: `${CLIENT_URL}login/success`,
+    successRedirect: `/auth/login/success`,
     failureRedirect: '/auth/login/failed',
     session: true,
-  }),
-  (requset, response) => {
-    response.redirect(`${CLIENT_URL}`);
-  }
+  })
 );
 
 // route  -  /auth/login/success
 router.get('/login/success', getLoginSuccess);
-
-// route  -  /auth/login/success
-router.get('/login/notify', getLoginNotify);
 
 // route  -  /auth/reset/password
 router.post('/reset/password', verifyUser);
