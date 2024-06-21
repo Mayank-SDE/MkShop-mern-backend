@@ -21,9 +21,9 @@ router.get('/google/callback', passport.authenticate('google', {
     // successRedirect: `${CLIENT_URL}login/success`,
     failureRedirect: '/auth/login/failed',
     session: true,
-}, (req, res) => {
-    res.redirect(`${CLIENT_URL}/login/success`);
-}));
+}), (req, res) => {
+    res.redirect(`${CLIENT_URL}`);
+});
 // route  -  /auth/github
 router.get('/github', passport.authenticate('github', {
     scope: ['profile', 'email'],
