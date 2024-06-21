@@ -63,7 +63,7 @@ passport.use(new GoogleStrategy({
                 role: 'user',
                 gender: 'male',
             });
-            newUser.save();
+            await newUser.save();
             console.log('new user', newUser);
             return done(null, newUser);
         }
@@ -101,7 +101,7 @@ passport.use(new GitHubStrategy({
                 gender: 'male',
                 email: `${profile.username}@gmail.com`,
             });
-            newUser.save();
+            await newUser.save();
             return done(null, newUser);
         }
         done(null, user);

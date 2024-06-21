@@ -33,7 +33,6 @@ export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 
 const app = express();
-app.set('trust proxy', 1);
 // Session configuration
 app.use(
   session({
@@ -41,7 +40,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true,
+      secure: false,
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
