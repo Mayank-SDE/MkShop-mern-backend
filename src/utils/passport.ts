@@ -182,13 +182,16 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
+  console.log('Serializing user', user);
   done(null, (user as UserInterface)._id);
 });
 
 passport.deserializeUser(async (_id: string, done) => {
   try {
+    console.log('Deserializing user', _id);
     const objectId = new mongoose.Types.ObjectId(_id);
     const user = await User.findById(objectId);
+    console.log('Deserializing user', user);
     if (!user) {
       return done(new Error('User not found'));
     }
