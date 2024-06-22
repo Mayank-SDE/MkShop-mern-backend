@@ -29,6 +29,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET as string;
 const allowedOrigins = [
   'https://mk-shop-mern-frontend.vercel.app',
   'http://localhost:3000', // Add any other origins you need
+  'https://mk-shop-mern-frontend.vercel.app/',
 ];
 
 const corsOptions = {
