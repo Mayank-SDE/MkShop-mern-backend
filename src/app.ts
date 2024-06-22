@@ -44,7 +44,7 @@ const corsOptions = {
     }
   },
   methods: 'GET,POST,PUT,PATCH,DELETE',
-  credentials: true,
+  credentials: false,
 };
 
 export const stripe = new Stripe(STRIPE_KEY);
