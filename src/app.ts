@@ -67,7 +67,7 @@ app.use(
   cors({
     origin: 'https://mk-shop-mern-frontend.vercel.app',
     methods: 'GET,POST,PUT,PATCH,DELETE',
-    credentials: true,
+    // credentials: true,
   })
 );
 
