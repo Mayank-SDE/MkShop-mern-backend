@@ -18,22 +18,34 @@ import MongoStore from 'connect-mongo';
 
 dotenv.config();
 
+const app = express();
+
 const MONGO_URI = process.env.MONGO_DB_URI as string;
 const MONGO_DB_NAME = process.env.MONGO_DB_NAME as string;
 const STRIPE_KEY = process.env.STRIPE_KEY as string;
 const SESSION_SECRET = process.env.SESSION_SECRET as string;
-const CORS_ORIGIN = process.env.CORS_ORIGN as string;
+const CORS_ORIGIN = process.env.CORS_ORIGIN as string;
 
-const corsOptions = {
-  allowedOrigins: CORS_ORIGIN,
-  methods: 'GET,POST,PUT,PATCH,DELETE',
-  credentials: true,
-};
+if (!CORS_ORIGIN) {
+  console.error('CORS_ORIGIN environment variable is not set');
+  process.exit(1); // Exit the application
+}
+
+console.log('CORS_ORIGIN:', CORS_ORIGIN); // Log the CORS_ORIGIN to ensure it's correctly set
 
 export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 
-const app = express();
+// CORS Options
+const corsOptions = {
+  origin: CORS_ORIGIN, // Use CORS_ORIGIN directly as a string
+  methods: 'GET,POST,PUT,PATCH,DELETE',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+
 app.set('trust proxy', 1);
 
 app.use(
@@ -62,29 +74,10 @@ mongoDBConnect(MONGO_URI, MONGO_DB_NAME);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static('assets'));
-
 app.use(morgan('dev'));
-
-// app.use((req: Request, res: Response, next: NextFunction) => {
-//   // res.header('Access-Control-Allow-Origin', '*');
-//   // res.header('Access-Control-Allow-Methods', '*');
-//   res.header('Access-Control-Allow-Headers', 'Content-Type');
-//   next();
-// });
-
-app.options('*', cors(corsOptions));
-
-app.get('/', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'API is working with /api/v1',
-  });
-});
 
 app.use('/auth', authRoute);
 app.use('/api/v1/product', productRoute);
