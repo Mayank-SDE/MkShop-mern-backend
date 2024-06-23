@@ -26,7 +26,7 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN as string;
 console.log(CORS_ORIGIN);
 const corsOptions = {
   // methods: 'GET,POST,PUT,PATCH,DELETE',
-  // credentials: true,
+  credentials: true,
   origin: CORS_ORIGIN,
 };
 
