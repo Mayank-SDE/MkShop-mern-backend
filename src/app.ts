@@ -32,13 +32,7 @@ export const nodeCache = new NodeCache();
 
 // CORS Options
 const corsOptions = {
-  origin: (origin: any, callback: any) => {
-    if (CORS_ORIGIN.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: CORS_ORIGIN,
   methods: 'GET,POST,PUT,PATCH,DELETE',
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
