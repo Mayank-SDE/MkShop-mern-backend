@@ -23,11 +23,11 @@ const MONGO_DB_NAME = process.env.MONGO_DB_NAME as string;
 const STRIPE_KEY = process.env.STRIPE_KEY as string;
 const SESSION_SECRET = process.env.SESSION_SECRET as string;
 const CORS_ORIGIN = process.env.CORS_ORIGIN as string;
-
+console.log(CORS_ORIGIN);
 const corsOptions = {
-  allowedOrigins: CORS_ORIGIN,
-  methods: 'GET,POST,PUT,PATCH,DELETE',
-  credentials: true,
+  // methods: 'GET,POST,PUT,PATCH,DELETE',
+  // credentials: true,
+  origin: CORS_ORIGIN,
 };
 
 export const stripe = new Stripe(STRIPE_KEY);
