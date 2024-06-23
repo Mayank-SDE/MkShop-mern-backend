@@ -15,6 +15,8 @@ import morgan from 'morgan';
 import './utils/passport.js';
 import { errorMiddleware } from './middlewares/error.js';
 import MongoStore from 'connect-mongo';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -74,7 +76,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static('assets'));
-
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(express.static(join(__dirname, '../client/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, '../client/dist/index.html'));
+});
 app.use(morgan('dev'));
 
 app.options('*', cors(corsOptions));
