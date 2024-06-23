@@ -69,7 +69,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static('assets'));
 
 app.use(morgan('dev'));
-app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
   res.status(200).json({
