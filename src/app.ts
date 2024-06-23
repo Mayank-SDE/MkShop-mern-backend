@@ -22,28 +22,10 @@ const MONGO_URI = process.env.MONGO_DB_URI as string;
 const MONGO_DB_NAME = process.env.MONGO_DB_NAME as string;
 const STRIPE_KEY = process.env.STRIPE_KEY as string;
 const SESSION_SECRET = process.env.SESSION_SECRET as string;
-
-const allowedOrigins = [
-  'https://mk-shop-mern-frontend.vercel.app',
-  'http://localhost:3000',
-  'https://mk-shop-mern-frontend.vercel.app/',
-  'https://mk-shop-mern-frontend-mayank-sdes-projects.vercel.app/',
-  'https://mk-shop-mern-frontend-mayank-sdes-projects.vercel.app',
-  'https://mk-shop-mern-frontend-git-main-mayank-sdes-projects.vercel.app/',
-  'https://mk-shop-mern-frontend-git-main-mayank-sdes-projects.vercel.app',
-];
+const CORS_ORIGIN = process.env.CORS_ORIGN as string;
 
 const corsOptions = {
-  origin: (
-    origin: string | undefined,
-    callback: (err: Error | null, origin?: boolean) => void
-  ) => {
-    if (allowedOrigins.includes(origin!) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  allowedOrigins: CORS_ORIGIN,
   methods: 'GET,POST,PUT,PATCH,DELETE',
   credentials: true,
   allowedHeaders: ['Content-Type', 'Access-Control-Allow-Origin'],
