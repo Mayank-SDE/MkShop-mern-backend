@@ -70,12 +70,12 @@ app.use('/assets', express.static('assets'));
 
 app.use(morgan('dev'));
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  // res.header('Access-Control-Allow-Origin', '*');
-  // res.header('Access-Control-Allow-Methods', '*');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   // res.header('Access-Control-Allow-Origin', '*');
+//   // res.header('Access-Control-Allow-Methods', '*');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type');
+//   next();
+// });
 
 app.options('*', cors(corsOptions));
 
