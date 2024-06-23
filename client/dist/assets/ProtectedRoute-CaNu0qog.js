@@ -1,1 +1,0 @@
-import{j as t,N as e,$ as x}from"./index-BGOoP327.js";const n=({isAuthenticated:o,adminOnly:r,admin:a,redirect:s="/",children:u})=>o?!a&&r?t.jsx(e,{to:s}):u??t.jsx(x,{}):t.jsx(e,{to:s});export{n as default};

@@ -15,8 +15,6 @@ import morgan from 'morgan';
 import './utils/passport.js';
 import { errorMiddleware } from './middlewares/error.js';
 import MongoStore from 'connect-mongo';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -24,7 +22,7 @@ const MONGO_URI = process.env.MONGO_DB_URI as string;
 const MONGO_DB_NAME = process.env.MONGO_DB_NAME as string;
 const STRIPE_KEY = process.env.STRIPE_KEY as string;
 const SESSION_SECRET = process.env.SESSION_SECRET as string;
-const CORS_ORIGIN = process.env.CORS_ORIGN as string;
+const CORS_ORIGIN = process.env.CORS_ORIGIN as string;
 
 const corsOptions = {
   allowedOrigins: CORS_ORIGIN,
@@ -64,25 +62,13 @@ mongoDBConnect(MONGO_URI, MONGO_DB_NAME);
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (!CORS_ORIGIN) {
-  console.error('CORS_ORIGIN environment variable is not set');
-  process.exit(1); // Exit the application
-}
-
-console.log('CORS_ORIGIN:', CORS_ORIGIN); // Log the CORS_ORIGIN to ensure it's correctly set
-
 app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/assets', express.static('assets'));
-const __dirname = dirname(fileURLToPath(import.meta.url));
-app.use(express.static(join(__dirname, '../client/dist')));
-app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, '../client/dist/index.html'));
-});
-app.use(morgan('dev'));
 
+app.use(morgan('dev'));
 app.options('*', cors(corsOptions));
 
 app.get('/', (req, res) => {
