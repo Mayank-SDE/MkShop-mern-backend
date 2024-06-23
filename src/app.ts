@@ -30,6 +30,10 @@ const allowedOrigins = [
   'https://mk-shop-mern-frontend.vercel.app',
   'http://localhost:3000', // Add any other origins you need
   'https://mk-shop-mern-frontend.vercel.app/',
+  'https://mk-shop-mern-frontend-mayank-sdes-projects.vercel.app/',
+  'https://mk-shop-mern-frontend-mayank-sdes-projects.vercel.app',
+  'https://mk-shop-mern-frontend-git-main-mayank-sdes-projects.vercel.app/',
+  'https://mk-shop-mern-frontend-git-main-mayank-sdes-projects.vercel.app',
 ];
 
 const corsOptions = {
@@ -51,7 +55,7 @@ export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 
 const app = express();
-// app.set('trust proxy', 1);
+app.set('trust proxy', 1);
 
 // Session configuration
 app.use(
