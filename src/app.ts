@@ -51,7 +51,7 @@ export const stripe = new Stripe(STRIPE_KEY);
 export const nodeCache = new NodeCache();
 
 const app = express();
-app.set('trust proxy', 1);
+// app.set('trust proxy', 1);
 
 // Session configuration
 app.use(
